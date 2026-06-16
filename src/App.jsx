@@ -2,7 +2,7 @@
 
   export default function App() {
     const [track, setTrack] = useState("Bahrain");
-    const [compund, setCompound] = useState("Medium");
+    const [compound, setCompound] = useState("Medium");
     const [laps, setLaps] = useState(10);
 
     const trackFactors = {
@@ -33,7 +33,7 @@
         </select>
 
         <h3>Tire Compound</h3>
-        <select value={compound} onCharge={(event) => setCompound(event.target.value)}>
+        <select value={compound} onChange={(event) => setCompound(event.target.value)}>
           <option>Soft</option>
           <option>Medium</option>
           <option>Hard</option>
@@ -43,7 +43,7 @@
         <input
           type="number"
           value={laps}
-          onChange={(event) => setLaps(Number(event.target.value)))
+          onChange={(event) => setLaps(Number(event.target.value))}
         />
 
         <h2>Estimated Tire Wear: {wear.toFixed(1)}%</h2>
