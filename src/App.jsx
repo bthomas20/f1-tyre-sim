@@ -96,7 +96,17 @@ export default function App() {
 
         <div style={styles.mapBox}>
           <h2>Track Map</h2>
-          <div style={styles.fakeMap}>{trackData[track].map}</div>
+          <div style={styles.fakeMap}>
+            <img
+              src="/tracks/bahrain.png"
+              alt="Bahrain Circuit"
+              style={{
+                maxWidth: "90vh",
+                maxHeight: "85vh",
+                objectFit: "contain",
+              }}
+            />
+          </div>
         </div>
 
         <div style={styles.results}>
@@ -114,43 +124,52 @@ export default function App() {
 
 const styles = {
   app: {
-    display: "flex",
     minHeight: "100vh",
+    width: "100vw",
     backgroundColor: "#111827",
     color: "white",
     fontFamily: "Arial, sans-serif",
+    position: "relative",
+    overflow: "hidden",
   },
+
   sidebar: {
-    width: "280px",
+    position: "absolute",
+    top: "40px",
+    left: "40px",
+    width: "260px",
     padding: "24px",
-    backgroundColor: "#020617",
+    backgroundColor: "rgba(2, 6, 23, 0.85)",
+    borderRadius: "16px",
     display: "flex",
     flexDirection: "column",
     gap: "12px",
+    zIndex: 2,
   },
+
   main: {
-    flex: 1,
-    padding: "40px",
-  },
-  mapBox: {
-    backgroundColor: "#1f2937",
-    padding: "24px",
-    borderRadius: "12px",
-    marginBottom: "24px",
-  },
-  fakeMap: {
-    height: "260px",
-    border: "2px dashed #64748b",
-    borderRadius: "12px",
+    minHeight: "100vh",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    fontSize: "28px",
   },
+
+  fakeMap: {
+    width: "80vw",
+    height: "80vh",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
   results: {
-    backgroundColor: "#1f2937",
+    position: "absolute",
+    right: "40px",
+    bottom: "40px",
+    backgroundColor: "rgba(31, 41, 55, 0.85)",
     padding: "24px",
-    borderRadius: "12px",
-    fontSize: "20px",
+    borderRadius: "16px",
+    fontSize: "18px",
+    zIndex: 2,
   },
 };
