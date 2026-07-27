@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
+import "./App.css";
 
 export default function App() {
   const [track, setTrack] = useState("Bahrain");
@@ -7,38 +8,52 @@ export default function App() {
   const [weather, setWeather] = useState("Dry");
   const [trackTemp, setTrackTemp] = useState(35);
 
+  const [zoom, setZoom] = useState(1);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const dragStart = useRef({ x: 0, y: 0 });
+
   const trackData = {
     Bahrain: {
       factor: 1.5,
-      map: "🇧🇭 Bahrain International Circuit",
+      image: "/tracks/bahrain.png",
+      circuitName: "Bahrain International Circuit",
+      location: "Sakhir, Bahrain",
     },
     Monaco: {
       factor: 0.7,
-      map: "🇲🇨 Circuit de Monaco",
+      image: null,
+      circuitName: "Circuit de Monaco",
+      location: "Monte Carlo, Monaco",
     },
     Silverstone: {
       factor: 1.3,
-      map: "🇬🇧 Silverstone Circuit",
+      image: null,
+      circuitName: "Silverstone Circuit",
+      location: "Silverstone, United Kingdom",
     },
     Spa: {
       factor: 1.1,
-      map: "🇧🇪 Spa-Francorchamps",
+      image: null,
+      circuitName: "Circuit de Spa-Francorchamps",
+      location: "Stavelot, Belgium",
     },
   };
 
   const compoundFactors = {
     Soft: 1.4,
-    Medium: 1.0,
+    Medium: 1,
     Hard: 0.8,
   };
 
   const weatherFactors = {
-    Dry: 1.0,
+    Dry: 1,
     Damp: 0.85,
     Wet: 0.65,
   };
 
-  const tempFactor = trackTemp > 40 ? 1.2 : trackTemp < 25 ? 0.9 : 1.0;
+  const tempFactor =
+    trackTemp > 40 ? 1.2 : trackTemp < 25 ? 0.9 : 1;
 
   const wear =
     laps *
@@ -49,127 +64,343 @@ export default function App() {
 
   const gripRemaining = Math.max(100 - wear, 0);
 
+  const getCondition = () => {
+    if (gripRemaining >= 75) return "OPTIMAL";
+    if (gripRemaining >= 45) return "WORN";
+    return "CRITICAL";
+  };
+
+  const getCompoundClass = () => {
+    return compound.toLowerCase();
+  };
+
+  const handleTrackChange = (event) => {
+    setTrack(event.target.value);
+    resetMap();
+  };
+
+  const handleWheel = (event) => {
+    event.preventDefault();
+
+    const nextZoom =
+      event.deltaY < 0
+        ? Math.min(zoom + 0.1, 2.5)
+        : Math.max(zoom - 0.1, 1);
+
+    setZoom(nextZoom);
+
+    if (nextZoom === 1) {
+      setPosition({ x: 0, y: 0 });
+    }
+  };
+
+  const handleMouseDown = (event) => {
+    if (zoom <= 1) return;
+
+    setIsDragging(true);
+    dragStart.current = {
+      x: event.clientX - position.x,
+      y: event.clientY - position.y,
+    };
+  };
+
+  const handleMouseMove = (event) => {
+    if (!isDragging) return;
+
+    setPosition({
+      x: event.clientX - dragStart.current.x,
+      y: event.clientY - dragStart.current.y,
+    });
+  };
+
+  const stopDragging = () => {
+    setIsDragging(false);
+  };
+
+  const zoomIn = () => {
+    setZoom((currentZoom) => Math.min(currentZoom + 0.2, 2.5));
+  };
+
+  const zoomOut = () => {
+    setZoom((currentZoom) => {
+      const nextZoom = Math.max(currentZoom - 0.2, 1);
+
+      if (nextZoom === 1) {
+        setPosition({ x: 0, y: 0 });
+      }
+
+      return nextZoom;
+    });
+  };
+
+  const resetMap = () => {
+    setZoom(1);
+    setPosition({ x: 0, y: 0 });
+  };
+
   return (
-    <div style={styles.app}>
-      <aside style={styles.sidebar}>
-        <h2>Filters</h2>
+    <div className="app">
+      <header className="top-header">
+        <div className="brand">
+          <span className="brand-marker">F1</span>
 
-        <label>Track</label>
-        <select value={track} onChange={(e) => setTrack(e.target.value)}>
-          <option>Bahrain</option>
-          <option>Monaco</option>
-          <option>Silverstone</option>
-          <option>Spa</option>
-        </select>
-
-        <label>Tire Compound</label>
-        <select value={compound} onChange={(e) => setCompound(e.target.value)}>
-          <option>Soft</option>
-          <option>Medium</option>
-          <option>Hard</option>
-        </select>
-
-        <label>Laps</label>
-        <input
-          type="number"
-          value={laps}
-          onChange={(e) => setLaps(Number(e.target.value))}
-        />
-
-        <label>Weather</label>
-        <select value={weather} onChange={(e) => setWeather(e.target.value)}>
-          <option>Dry</option>
-          <option>Damp</option>
-          <option>Wet</option>
-        </select>
-
-        <label>Track Temp °C</label>
-        <input
-          type="number"
-          value={trackTemp}
-          onChange={(e) => setTrackTemp(Number(e.target.value))}
-        />
-      </aside>
-
-      <main style={styles.main}>
-        <h1>F1 Tire Degradation Simulator</h1>
-
-        <div style={styles.mapBox}>
-          <h2>Track Map</h2>
-          <div style={styles.fakeMap}>
-            <img
-              src="/tracks/bahrain.png"
-              alt="Bahrain Circuit"
-              style={{
-                maxWidth: "90vh",
-                maxHeight: "85vh",
-                objectFit: "contain",
-              }}
-            />
+          <div>
+            <h1>Tyre Degradation Simulator</h1>
+            <p>Race strategy and tyre-performance analysis</p>
           </div>
         </div>
 
-        <div style={styles.results}>
-          <h2>Results</h2>
-          <p>Estimated Tire Wear: {wear.toFixed(1)}%</p>
-          <p>Grip Remaining: {gripRemaining.toFixed(1)}%</p>
-          <p>Track: {track}</p>
-          <p>Compound: {compound}</p>
-          <p>Weather: {weather}</p>
+        <div className="live-status">
+          <span className="status-light"></span>
+          SIMULATION LIVE
         </div>
+      </header>
+
+      <section className="filter-panel">
+        <div className="filter-group">
+          <label htmlFor="track">Track</label>
+          <select
+            id="track"
+            value={track}
+            onChange={handleTrackChange}
+          >
+            <option value="Bahrain">Bahrain</option>
+            <option value="Monaco">Monaco</option>
+            <option value="Silverstone">Silverstone</option>
+            <option value="Spa">Spa-Francorchamps</option>
+          </select>
+        </div>
+
+        <div className="filter-group">
+          <label htmlFor="compound">Tyre compound</label>
+          <select
+            id="compound"
+            value={compound}
+            onChange={(event) => setCompound(event.target.value)}
+          >
+            <option value="Soft">Soft</option>
+            <option value="Medium">Medium</option>
+            <option value="Hard">Hard</option>
+          </select>
+        </div>
+
+        <div className="filter-group">
+          <label htmlFor="laps">Stint laps</label>
+          <input
+            id="laps"
+            type="number"
+            min="1"
+            max="70"
+            value={laps}
+            onChange={(event) =>
+              setLaps(Math.max(1, Number(event.target.value)))
+            }
+          />
+        </div>
+
+        <div className="filter-group">
+          <label htmlFor="weather">Weather</label>
+          <select
+            id="weather"
+            value={weather}
+            onChange={(event) => setWeather(event.target.value)}
+          >
+            <option value="Dry">Dry</option>
+            <option value="Damp">Damp</option>
+            <option value="Wet">Wet</option>
+          </select>
+        </div>
+
+        <div className="filter-group">
+          <label htmlFor="temperature">Track temperature</label>
+
+          <div className="number-input">
+            <input
+              id="temperature"
+              type="number"
+              min="0"
+              max="70"
+              value={trackTemp}
+              onChange={(event) =>
+                setTrackTemp(Number(event.target.value))
+              }
+            />
+            <span>°C</span>
+          </div>
+        </div>
+      </section>
+
+      <main className="dashboard">
+        <section className="track-section">
+          <div className="section-heading">
+            <div>
+              <span className="section-label">ACTIVE CIRCUIT</span>
+              <h2>{trackData[track].circuitName}</h2>
+              <p>{trackData[track].location}</p>
+            </div>
+
+            <div className="map-controls">
+              <button
+                type="button"
+                onClick={zoomOut}
+                aria-label="Zoom out"
+              >
+                −
+              </button>
+
+              <span>{Math.round(zoom * 100)}%</span>
+
+              <button
+                type="button"
+                onClick={zoomIn}
+                aria-label="Zoom in"
+              >
+                +
+              </button>
+
+              <button
+                type="button"
+                className="reset-button"
+                onClick={resetMap}
+              >
+                Reset
+              </button>
+            </div>
+          </div>
+
+          <div
+            className={`map-viewport ${
+              isDragging ? "dragging" : ""
+            }`}
+            onWheel={handleWheel}
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={stopDragging}
+            onMouseLeave={stopDragging}
+          >
+            {trackData[track].image ? (
+              <img
+                src={trackData[track].image}
+                alt={`${trackData[track].circuitName} track map`}
+                draggable="false"
+                style={{
+                  transform: `translate(${position.x}px, ${position.y}px) scale(${zoom})`,
+                }}
+              />
+            ) : (
+              <div className="map-placeholder">
+                <span>TRACK IMAGE UNAVAILABLE</span>
+                <h3>{trackData[track].circuitName}</h3>
+                <p>
+                  Add this circuit image later inside
+                  public/tracks.
+                </p>
+              </div>
+            )}
+
+            {trackData[track].image && (
+              <div className="map-instructions">
+                Scroll to zoom · Drag to move
+              </div>
+            )}
+          </div>
+        </section>
+
+        <aside className="telemetry-panel">
+          <div className="telemetry-heading">
+            <span>TYRE TELEMETRY</span>
+            <strong>{getCondition()}</strong>
+          </div>
+
+          <div className="tyre-display">
+            <div className={`tyre-ring ${getCompoundClass()}`}>
+              <div>
+                <span>{compound.charAt(0)}</span>
+                <small>{compound}</small>
+              </div>
+            </div>
+          </div>
+
+          <div className="metric">
+            <div className="metric-header">
+              <span>Estimated wear</span>
+              <strong>{wear.toFixed(1)}%</strong>
+            </div>
+
+            <div className="progress-track">
+              <div
+                className="progress-fill wear-fill"
+                style={{
+                  width: `${Math.min(wear, 100)}%`,
+                }}
+              ></div>
+            </div>
+          </div>
+
+          <div className="metric">
+            <div className="metric-header">
+              <span>Grip remaining</span>
+              <strong>{gripRemaining.toFixed(1)}%</strong>
+            </div>
+
+            <div className="progress-track">
+              <div
+                className="progress-fill grip-fill"
+                style={{
+                  width: `${gripRemaining}%`,
+                }}
+              ></div>
+            </div>
+          </div>
+
+          <div className="data-grid">
+            <div className="data-box">
+              <span>Track</span>
+              <strong>{track}</strong>
+            </div>
+
+            <div className="data-box">
+              <span>Compound</span>
+              <strong>{compound}</strong>
+            </div>
+
+            <div className="data-box">
+              <span>Weather</span>
+              <strong>{weather}</strong>
+            </div>
+
+            <div className="data-box">
+              <span>Temperature</span>
+              <strong>{trackTemp}°C</strong>
+            </div>
+
+            <div className="data-box">
+              <span>Stint</span>
+              <strong>{laps} laps</strong>
+            </div>
+
+            <div className="data-box">
+              <span>Wear factor</span>
+              <strong>{trackData[track].factor.toFixed(1)}x</strong>
+            </div>
+          </div>
+
+          <div className="strategy-message">
+            <span>ENGINEER NOTE</span>
+            <p>
+              {gripRemaining >= 75 &&
+                "Tyres remain inside the optimal performance window."}
+
+              {gripRemaining < 75 &&
+                gripRemaining >= 45 &&
+                "Performance is beginning to fall. Monitor lap times."}
+
+              {gripRemaining < 45 &&
+                "Grip loss is critical. A pit stop should be considered."}
+            </p>
+          </div>
+        </aside>
       </main>
     </div>
   );
 }
-
-const styles = {
-  app: {
-    minHeight: "100vh",
-    width: "100vw",
-    backgroundColor: "#111827",
-    color: "white",
-    fontFamily: "Arial, sans-serif",
-    position: "relative",
-    overflow: "hidden",
-  },
-
-  sidebar: {
-    position: "absolute",
-    top: "40px",
-    left: "40px",
-    width: "260px",
-    padding: "24px",
-    backgroundColor: "rgba(2, 6, 23, 0.85)",
-    borderRadius: "16px",
-    display: "flex",
-    flexDirection: "column",
-    gap: "12px",
-    zIndex: 2,
-  },
-
-  main: {
-    minHeight: "100vh",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-
-  fakeMap: {
-    width: "80vw",
-    height: "80vh",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-
-  results: {
-    position: "absolute",
-    right: "40px",
-    bottom: "40px",
-    backgroundColor: "rgba(31, 41, 55, 0.85)",
-    padding: "24px",
-    borderRadius: "16px",
-    fontSize: "18px",
-    zIndex: 2,
-  },
-};
