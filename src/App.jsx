@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import "./App.css";
 import BahrainTrack from "./components/BahrainTrack";
 
+
 const BAHRAIN_TURN_DATA = {
   1: {
     type: "Tight right-hander",
@@ -134,6 +135,8 @@ export default function App() {
   const [trackTemp, setTrackTemp] = useState(35);
   const [selectedTurn, setSelectedTurn] = useState(null);
 
+  const [isSimulating, setIsSimulating] = useState(false);
+
   const MIN_ZOOM = 0.65;
   const DEFAULT_ZOOM = 0.82;
   const MAX_ZOOM = 2.5;
@@ -214,6 +217,7 @@ export default function App() {
   };
 
   const getCompoundClass = () => compound.toLowerCase();
+
 
   const resetMap = () => {
     setZoom(DEFAULT_ZOOM);
@@ -391,6 +395,14 @@ export default function App() {
               >
                 Reset
               </button>
+
+	      <button
+		type="button"
+		className={`simulation-button ${isSimulating ? "active" : ""}`}
+		onClick={() => setIsSimulating((current) => !current)}
+	      >
+		{isSimulating ? "Stop" : "Start"}
+	      </button>
             </div>
           </div>
 
@@ -411,7 +423,8 @@ export default function App() {
               >
                 <ActiveTrackComponent
                   selectedTurn={selectedTurn}
-                  onSelectTurn={setSelectedTurn}
+                  onTurnSelect={setSelectedTurn}
+		  isSimulating={isSimulating}
                 />
               </div>
             ) : (

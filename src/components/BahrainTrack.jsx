@@ -1,3 +1,5 @@
+import { useEffect, useRef } from "react";
+
 const TRACK_PATH = `
   M 88 530
   L 820 530
@@ -50,10 +52,35 @@ const TURN_MARKERS = [
 
 export default function BahrainTrack({
   selectedTurn,
-  onSelectTurn,
+  onTurnSelect,
+  isSimulating,
 }) {
+  const svgRef = useRef(null)
+
+  useEffect(() => {
+    const svg = svgRef.current
+
+    if (!svg) return;
+
+    if (isSimulating) {
+      svg.unpauseAnimations();
+    } else {
+      svg.pauseAnimations();
+    }
+  }, [isSimulating]);
+
+  useEffect(() => {
+    const svg = svgRef.current
+
+    if (!svg) return;
+
+    svg.setCurrentTime(0);
+    svg.pauseAnimations();
+  }, []);
+
   return (
     <svg
+      ref={svgRef}
       className="bahrain-track"
       viewBox="0 0 960 600"
       role="img"
@@ -154,16 +181,17 @@ export default function BahrainTrack({
         <rect className="lap-car-wheel" x="4" y="-8" width="5" height="3" rx="1" />
         <rect className="lap-car-wheel" x="4" y="5" width="5" height="3" rx="1" />
 
-        <animateMotion
-          dur="11s"
-          repeatCount="indefinite"
-          rotate="auto"
-          keyPoints="1;0"
-          keyTimes="0;1"
-          calcMode="linear"
-        >
-          <mpath href="#bahrainCircuitPath" />
-        </animateMotion>
+	<animateMotion
+	   dur="11s"
+	   repeatCount="indefinite"
+           rotate="auto"
+           keyPoints="0.2;0;1;0.2"
+           keyTimes="0;0.2;0.2;1"
+           calcMode="linear"
+         >
+           <mpath href="#bahrainCircuitPath" />
+         </animateMotion>
+
       </g>
 
       {TURN_MARKERS.map((turn) => {
@@ -179,12 +207,12 @@ export default function BahrainTrack({
             aria-label={`Select turn ${turn.number}`}
             onClick={(event) => {
               event.stopPropagation();
-              onSelectTurn(turn.number);
+              onTurnSelect(turn.number);
             }}
             onKeyDown={(event) => {
               if (event.key === "Enter" || event.key === " ") {
                 event.preventDefault();
-                onSelectTurn(turn.number);
+                onTurnSelect(turn.number);
               }
             }}
           >
