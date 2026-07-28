@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import "./App.css";
+import BahrainTrack from "./components/BahrainTrack";
 
 export default function App() {
   const [track, setTrack] = useState("Bahrain");
@@ -7,8 +8,13 @@ export default function App() {
   const [laps, setLaps] = useState(10);
   const [weather, setWeather] = useState("Dry");
   const [trackTemp, setTrackTemp] = useState(35);
+  const [selectedTurn, setSelectedTurn] = useState(null);
 
-  const [zoom, setZoom] = useState(1);
+  const MIN_ZOOM = 0.65;
+  const DEFAULT_ZOOM = 0.82;
+  const MAX_ZOOM = 2.5;
+
+  const [zoom, setZoom] = useState(DEFAULT_ZOOM);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const dragStart = useRef({ x: 0, y: 0 });
@@ -16,27 +22,35 @@ export default function App() {
   const trackData = {
     Bahrain: {
       factor: 1.5,
-      image: "/tracks/bahrain.png",
+      component: BahrainTrack,
       circuitName: "Bahrain International Circuit",
       location: "Sakhir, Bahrain",
+      turns: 15,
+      length: "5.412 km",
     },
     Monaco: {
       factor: 0.7,
-      image: null,
+      component: null,
       circuitName: "Circuit de Monaco",
       location: "Monte Carlo, Monaco",
+      turns: 19,
+      length: "3.337 km",
     },
     Silverstone: {
       factor: 1.3,
-      image: null,
+      component: null,
       circuitName: "Silverstone Circuit",
       location: "Silverstone, United Kingdom",
+      turns: 18,
+      length: "5.891 km",
     },
     Spa: {
       factor: 1.1,
-      image: null,
+      component: null,
       circuitName: "Circuit de Spa-Francorchamps",
       location: "Stavelot, Belgium",
+      turns: 19,
+      length: "7.004 km",
     },
   };
 
@@ -63,6 +77,7 @@ export default function App() {
     tempFactor;
 
   const gripRemaining = Math.max(100 - wear, 0);
+  const ActiveTrackComponent = trackData[track].component;
 
   const getCondition = () => {
     if (gripRemaining >= 75) return "OPTIMAL";
@@ -70,12 +85,16 @@ export default function App() {
     return "CRITICAL";
   };
 
-  const getCompoundClass = () => {
-    return compound.toLowerCase();
+  const getCompoundClass = () => compound.toLowerCase();
+
+  const resetMap = () => {
+    setZoom(DEFAULT_ZOOM);
+    setPosition({ x: 0, y: 0 });
   };
 
   const handleTrackChange = (event) => {
     setTrack(event.target.value);
+    setSelectedTurn(null);
     resetMap();
   };
 
@@ -84,18 +103,18 @@ export default function App() {
 
     const nextZoom =
       event.deltaY < 0
-        ? Math.min(zoom + 0.1, 2.5)
-        : Math.max(zoom - 0.1, 1);
+        ? Math.min(zoom + 0.1, MAX_ZOOM)
+        : Math.max(zoom - 0.1, MIN_ZOOM);
 
     setZoom(nextZoom);
 
-    if (nextZoom === 1) {
+    if (nextZoom <= DEFAULT_ZOOM) {
       setPosition({ x: 0, y: 0 });
     }
   };
 
   const handleMouseDown = (event) => {
-    if (zoom <= 1) return;
+    if (event.target.closest(".turn-marker")) return;
 
     setIsDragging(true);
     dragStart.current = {
@@ -113,29 +132,24 @@ export default function App() {
     });
   };
 
-  const stopDragging = () => {
-    setIsDragging(false);
-  };
+  const stopDragging = () => setIsDragging(false);
 
   const zoomIn = () => {
-    setZoom((currentZoom) => Math.min(currentZoom + 0.2, 2.5));
+    setZoom((currentZoom) =>
+      Math.min(currentZoom + 0.2, MAX_ZOOM)
+    );
   };
 
   const zoomOut = () => {
     setZoom((currentZoom) => {
-      const nextZoom = Math.max(currentZoom - 0.2, 1);
+      const nextZoom = Math.max(currentZoom - 0.2, MIN_ZOOM);
 
-      if (nextZoom === 1) {
+      if (nextZoom <= DEFAULT_ZOOM) {
         setPosition({ x: 0, y: 0 });
       }
 
       return nextZoom;
     });
-  };
-
-  const resetMap = () => {
-    setZoom(1);
-    setPosition({ x: 0, y: 0 });
   };
 
   return (
@@ -159,11 +173,7 @@ export default function App() {
       <section className="filter-panel">
         <div className="filter-group">
           <label htmlFor="track">Track</label>
-          <select
-            id="track"
-            value={track}
-            onChange={handleTrackChange}
-          >
+          <select id="track" value={track} onChange={handleTrackChange}>
             <option value="Bahrain">Bahrain</option>
             <option value="Monaco">Monaco</option>
             <option value="Silverstone">Silverstone</option>
@@ -213,7 +223,6 @@ export default function App() {
 
         <div className="filter-group">
           <label htmlFor="temperature">Track temperature</label>
-
           <div className="number-input">
             <input
               id="temperature"
@@ -240,24 +249,13 @@ export default function App() {
             </div>
 
             <div className="map-controls">
-              <button
-                type="button"
-                onClick={zoomOut}
-                aria-label="Zoom out"
-              >
+              <button type="button" onClick={zoomOut} aria-label="Zoom out">
                 −
               </button>
-
               <span>{Math.round(zoom * 100)}%</span>
-
-              <button
-                type="button"
-                onClick={zoomIn}
-                aria-label="Zoom in"
-              >
+              <button type="button" onClick={zoomIn} aria-label="Zoom in">
                 +
               </button>
-
               <button
                 type="button"
                 className="reset-button"
@@ -269,39 +267,60 @@ export default function App() {
           </div>
 
           <div
-            className={`map-viewport ${
-              isDragging ? "dragging" : ""
-            }`}
+            className={`map-viewport ${isDragging ? "dragging" : ""}`}
             onWheel={handleWheel}
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
             onMouseUp={stopDragging}
             onMouseLeave={stopDragging}
           >
-            {trackData[track].image ? (
-              <img
-                src={trackData[track].image}
-                alt={`${trackData[track].circuitName} track map`}
-                draggable="false"
+            {ActiveTrackComponent ? (
+              <div
+                className="interactive-track"
                 style={{
                   transform: `translate(${position.x}px, ${position.y}px) scale(${zoom})`,
                 }}
-              />
+              >
+                <ActiveTrackComponent
+                  selectedTurn={selectedTurn}
+                  onSelectTurn={setSelectedTurn}
+                />
+              </div>
             ) : (
               <div className="map-placeholder">
-                <span>TRACK IMAGE UNAVAILABLE</span>
+                <span>TRACK SVG UNAVAILABLE</span>
                 <h3>{trackData[track].circuitName}</h3>
-                <p>
-                  Add this circuit image later inside
-                  public/tracks.
-                </p>
+                <p>Add this circuit component later inside src/components.</p>
               </div>
             )}
 
-            {trackData[track].image && (
-              <div className="map-instructions">
-                Scroll to zoom · Drag to move
-              </div>
+            {ActiveTrackComponent && (
+              <>
+                <div className="map-corner top-left"></div>
+                <div className="map-corner top-right"></div>
+                <div className="map-corner bottom-left"></div>
+                <div className="map-corner bottom-right"></div>
+
+                <div className="circuit-readout circuit-readout-left">
+                  <span>TURNS</span>
+                  <strong>{trackData[track].turns}</strong>
+                </div>
+
+                <div className="circuit-readout circuit-readout-right">
+                  <span>LENGTH</span>
+                  <strong>{trackData[track].length}</strong>
+                </div>
+
+                {selectedTurn && (
+                  <div className="selected-turn-readout">
+                    SELECTED TURN <strong>{selectedTurn}</strong>
+                  </div>
+                )}
+
+                <div className="map-instructions">
+                  Click a turn · Scroll to zoom · Drag to move
+                </div>
+              </>
             )}
           </div>
         </section>
@@ -330,9 +349,7 @@ export default function App() {
             <div className="progress-track">
               <div
                 className="progress-fill wear-fill"
-                style={{
-                  width: `${Math.min(wear, 100)}%`,
-                }}
+                style={{ width: `${Math.min(wear, 100)}%` }}
               ></div>
             </div>
           </div>
@@ -346,9 +363,7 @@ export default function App() {
             <div className="progress-track">
               <div
                 className="progress-fill grip-fill"
-                style={{
-                  width: `${gripRemaining}%`,
-                }}
+                style={{ width: `${gripRemaining}%` }}
               ></div>
             </div>
           </div>

@@ -1,4 +1,3 @@
-cat > src/App.css <<'EOF'
 :root {
   font-family:
     Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
@@ -603,4 +602,251 @@ button {
     margin-left: auto;
   }
 }
-EOF
+
+
+/* Interactive Bahrain SVG */
+
+.interactive-track {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  transform-origin: center;
+  transition: transform 0.08s linear;
+}
+
+.bahrain-track {
+  width: min(94%, 1080px);
+  height: 94%;
+  overflow: visible;
+  touch-action: none;
+}
+
+.svg-map-background {
+  fill: #05080d;
+}
+
+.track-grid-dot {
+  fill: rgba(116, 138, 166, 0.18);
+}
+
+.track-underlay {
+  fill: none;
+  stroke: rgba(80, 105, 136, 0.5);
+  stroke-width: 16;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.track-main-line {
+  fill: none;
+  stroke: url(#trackStroke);
+  stroke-width: 7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.turn-marker {
+  cursor: pointer;
+  outline: none;
+}
+
+.turn-marker-hitbox {
+  fill: transparent;
+}
+
+.turn-marker-ring {
+  fill: #07101a;
+  stroke: #6b7c91;
+  stroke-width: 1.5;
+  transition:
+    fill 0.18s ease,
+    stroke 0.18s ease,
+    transform 0.18s ease,
+    filter 0.18s ease;
+}
+
+.turn-marker-text {
+  fill: #dce7f5;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.4px;
+  pointer-events: none;
+  user-select: none;
+}
+
+.turn-marker:hover .turn-marker-ring,
+.turn-marker:focus .turn-marker-ring,
+.turn-marker.selected .turn-marker-ring {
+  fill: #e10600;
+  stroke: #ffffff;
+  transform: scale(1.1);
+  filter: drop-shadow(0 0 8px rgba(225, 6, 0, 0.9));
+}
+
+.turn-marker:hover .turn-marker-text,
+.turn-marker:focus .turn-marker-text,
+.turn-marker.selected .turn-marker-text {
+  fill: #ffffff;
+}
+
+.start-light-square {
+  fill: #ffffff;
+}
+
+.start-dark-square {
+  fill: #101824;
+}
+
+.direction-indicator {
+  fill: none;
+  stroke: #e10600;
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 7px rgba(225, 6, 0, 0.65));
+}
+
+.lap-car {
+  pointer-events: none;
+}
+
+.lap-car-body {
+  fill: #e10600;
+  stroke: #ffffff;
+  stroke-width: 1.2;
+}
+
+.lap-car-cockpit {
+  fill: #ffffff;
+}
+
+.lap-car-wheel {
+  fill: #05080d;
+  stroke: #ffffff;
+  stroke-width: 0.7;
+}
+
+.map-corner {
+  position: absolute;
+  width: 25px;
+  height: 25px;
+  pointer-events: none;
+}
+
+.map-corner::before,
+.map-corner::after {
+  content: "";
+  position: absolute;
+  background: #e10600;
+  box-shadow: 0 0 8px rgba(225, 6, 0, 0.45);
+}
+
+.map-corner::before {
+  width: 25px;
+  height: 2px;
+}
+
+.map-corner::after {
+  width: 2px;
+  height: 25px;
+}
+
+.map-corner.top-left {
+  top: 16px;
+  left: 16px;
+}
+
+.map-corner.top-right {
+  top: 16px;
+  right: 16px;
+  transform: rotate(90deg);
+}
+
+.map-corner.bottom-left {
+  bottom: 16px;
+  left: 16px;
+  transform: rotate(-90deg);
+}
+
+.map-corner.bottom-right {
+  right: 16px;
+  bottom: 16px;
+  transform: rotate(180deg);
+}
+
+.circuit-readout {
+  position: absolute;
+  top: 18px;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 7px 10px;
+  border: 1px solid rgba(60, 76, 99, 0.8);
+  background: rgba(5, 8, 13, 0.78);
+  pointer-events: none;
+}
+
+.circuit-readout-left {
+  left: 54px;
+}
+
+.circuit-readout-right {
+  right: 54px;
+}
+
+.circuit-readout span {
+  color: #718198;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+}
+
+.circuit-readout strong {
+  color: #ffffff;
+  font-size: 13px;
+  text-transform: uppercase;
+}
+
+.selected-turn-readout {
+  position: absolute;
+  left: 50%;
+  bottom: 12px;
+  padding: 7px 11px;
+  color: #8d99aa;
+  border: 1px solid #2f3a4b;
+  border-left: 3px solid #e10600;
+  background: rgba(5, 8, 13, 0.9);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.selected-turn-readout strong {
+  margin-left: 5px;
+  color: #ffffff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lap-car {
+    display: none;
+  }
+
+  .interactive-track,
+  .turn-marker-ring {
+    transition: none;
+  }
+}
+
+@media (max-width: 700px) {
+  .circuit-readout {
+    display: none;
+  }
+
+  .map-instructions {
+    max-width: calc(100% - 28px);
+    text-align: center;
+  }
+}
