@@ -134,6 +134,7 @@ export default function App() {
   const [weather, setWeather] = useState("Dry");
   const [trackTemp, setTrackTemp] = useState(35);
   const [selectedTurn, setSelectedTurn] = useState(null);
+  const [currentLap, setCurrentLap] = useState(0);
 
   const [isSimulating, setIsSimulating] = useState(false);
 
@@ -327,7 +328,7 @@ export default function App() {
         </div>
 
         <div className="filter-group">
-          <label htmlFor="laps">Stint laps</label>
+          <label htmlFor="laps">Target laps</label>
           <input
             id="laps"
             type="number"
@@ -531,8 +532,8 @@ export default function App() {
             </div>
 
             <div className="data-box">
-              <span>Stint</span>
-              <strong>{laps} laps</strong>
+              <span>Current Lap</span>
+              <strong>{currentLap} / {laps}</strong>
             </div>
 
             <div className="data-box">
