@@ -231,6 +231,19 @@ export default function App() {
     resetMap();
   };
 
+  const handleLapComplete = () => {
+    setCurrentLap((previousLap) => {
+      const nextLap = previousLap + 1;
+
+      if (nextLap >= laps) {
+        setIsSimulating(false);
+        return laps;
+      }
+   
+      return nextLap;
+    });
+  };
+
   const handleWheel = (event) => {
     event.preventDefault();
 
@@ -400,7 +413,13 @@ export default function App() {
 	      <button
 		type="button"
 		className={`simulation-button ${isSimulating ? "active" : ""}`}
-		onClick={() => setIsSimulating((current) => !current)}
+		onClick={() => {
+                  if (currentLap >= laps) {
+		    setCurrentLap(0);
+		  }
+
+		  setIsSimulating((current) => !current);
+		}}
 	      >
 		{isSimulating ? "Stop" : "Start"}
 	      </button>
@@ -426,6 +445,7 @@ export default function App() {
                   selectedTurn={selectedTurn}
                   onTurnSelect={setSelectedTurn}
 		  isSimulating={isSimulating}
+		  onLapComplete={handleLapComplete}
                 />
               </div>
             ) : (

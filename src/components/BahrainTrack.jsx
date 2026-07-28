@@ -54,8 +54,10 @@ export default function BahrainTrack({
   selectedTurn,
   onTurnSelect,
   isSimulating,
+  onLapComplete,
 }) {
   const svgRef = useRef(null)
+  const animationRef = useRef(null)
 
   useEffect(() => {
     const svg = svgRef.current
@@ -77,6 +79,23 @@ export default function BahrainTrack({
     svg.setCurrentTime(0);
     svg.pauseAnimations();
   }, []);
+
+  useEffect(() => {
+    const animation = animationRef.current;
+
+    if (!animation || !onLapComplete) return;
+
+    const handleRepeat = () => {
+      onLapComplete();
+    };
+  
+    animation.addEventListener("repeatEvent", handleRepeat);
+
+    return () => {
+       animation.removeEventListener("repeatEvent", handleRepeat);
+    };
+  }, [onLapComplete]);
+
 
   return (
     <svg
@@ -182,6 +201,7 @@ export default function BahrainTrack({
         <rect className="lap-car-wheel" x="4" y="5" width="5" height="3" rx="1" />
 
 	<animateMotion
+	   ref={animationRef}
 	   dur="11s"
 	   repeatCount="indefinite"
            rotate="auto"
