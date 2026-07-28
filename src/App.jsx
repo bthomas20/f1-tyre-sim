@@ -2,6 +2,130 @@ import { useRef, useState } from "react";
 import "./App.css";
 import BahrainTrack from "./components/BahrainTrack";
 
+const BAHRAIN_TURN_DATA = {
+  1: {
+    type: "Tight right-hander",
+    entrySpeed: 325,
+    apexSpeed: 85,
+    exitSpeed: 150,
+    braking: "Very high",
+    tyreStress: "High",
+  },
+  2: {
+    type: "Fast left kink",
+    entrySpeed: 150,
+    apexSpeed: 145,
+    exitSpeed: 185,
+    braking: "Low",
+    tyreStress: "Medium",
+  },
+  3: {
+    type: "Fast right kink",
+    entrySpeed: 185,
+    apexSpeed: 180,
+    exitSpeed: 235,
+    braking: "Low",
+    tyreStress: "Medium",
+  },
+  4: {
+    type: "Heavy-braking right",
+    entrySpeed: 300,
+    apexSpeed: 105,
+    exitSpeed: 165,
+    braking: "Very high",
+    tyreStress: "High",
+  },
+  5: {
+    type: "Fast left",
+    entrySpeed: 245,
+    apexSpeed: 220,
+    exitSpeed: 225,
+    braking: "Low",
+    tyreStress: "High",
+  },
+  6: {
+    type: "Fast right",
+    entrySpeed: 225,
+    apexSpeed: 205,
+    exitSpeed: 195,
+    braking: "Medium",
+    tyreStress: "High",
+  },
+  7: {
+    type: "Medium-speed left",
+    entrySpeed: 195,
+    apexSpeed: 150,
+    exitSpeed: 180,
+    braking: "Medium",
+    tyreStress: "High",
+  },
+  8: {
+    type: "Tight right-hander",
+    entrySpeed: 245,
+    apexSpeed: 90,
+    exitSpeed: 145,
+    braking: "High",
+    tyreStress: "Medium",
+  },
+  9: {
+    type: "Long left entry",
+    entrySpeed: 215,
+    apexSpeed: 165,
+    exitSpeed: 145,
+    braking: "Medium",
+    tyreStress: "High",
+  },
+  10: {
+    type: "Downhill left hairpin",
+    entrySpeed: 145,
+    apexSpeed: 80,
+    exitSpeed: 135,
+    braking: "High",
+    tyreStress: "Very high",
+  },
+  11: {
+    type: "Medium-speed left",
+    entrySpeed: 285,
+    apexSpeed: 175,
+    exitSpeed: 205,
+    braking: "High",
+    tyreStress: "High",
+  },
+  12: {
+    type: "Fast right",
+    entrySpeed: 205,
+    apexSpeed: 195,
+    exitSpeed: 240,
+    braking: "Low",
+    tyreStress: "High",
+  },
+  13: {
+    type: "Uphill right-hander",
+    entrySpeed: 245,
+    apexSpeed: 135,
+    exitSpeed: 190,
+    braking: "High",
+    tyreStress: "Medium",
+  },
+  14: {
+    type: "Final braking zone",
+    entrySpeed: 305,
+    apexSpeed: 120,
+    exitSpeed: 165,
+    braking: "Very high",
+    tyreStress: "High",
+  },
+  15: {
+    type: "Flat-out exit bend",
+    entrySpeed: 165,
+    apexSpeed: 175,
+    exitSpeed: 285,
+    braking: "None",
+    tyreStress: "Medium",
+  },
+};
+
+
 export default function App() {
   const [track, setTrack] = useState("Bahrain");
   const [compound, setCompound] = useState("Medium");
@@ -78,6 +202,10 @@ export default function App() {
 
   const gripRemaining = Math.max(100 - wear, 0);
   const ActiveTrackComponent = trackData[track].component;
+  const selectedTurnData =
+    track === "Bahrain" && selectedTurn
+      ? BAHRAIN_TURN_DATA[selectedTurn]
+      : null;
 
   const getCondition = () => {
     if (gripRemaining >= 75) return "OPTIMAL";
@@ -398,6 +526,56 @@ export default function App() {
               <span>Wear factor</span>
               <strong>{trackData[track].factor.toFixed(1)}x</strong>
             </div>
+          </div>
+
+          <div className="turn-analysis">
+            <div className="turn-analysis-heading">
+              <span>TURN ANALYSIS</span>
+              <strong>
+                {selectedTurn ? `T${selectedTurn}` : "SELECT A TURN"}
+              </strong>
+            </div>
+
+            {selectedTurnData ? (
+              <>
+                <div className="turn-type">
+                  <span>CORNER TYPE</span>
+                  <strong>{selectedTurnData.type}</strong>
+                </div>
+
+                <div className="turn-data-grid">
+                  <div className="turn-data-box">
+                    <span>Entry speed</span>
+                    <strong>{selectedTurnData.entrySpeed} km/h</strong>
+                  </div>
+
+                  <div className="turn-data-box">
+                    <span>Apex speed</span>
+                    <strong>{selectedTurnData.apexSpeed} km/h</strong>
+                  </div>
+
+                  <div className="turn-data-box">
+                    <span>Exit speed</span>
+                    <strong>{selectedTurnData.exitSpeed} km/h</strong>
+                  </div>
+
+                  <div className="turn-data-box">
+                    <span>Braking</span>
+                    <strong>{selectedTurnData.braking}</strong>
+                  </div>
+
+                  <div className="turn-data-box turn-data-box-wide">
+                    <span>Tyre stress</span>
+                    <strong>{selectedTurnData.tyreStress}</strong>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <p className="turn-analysis-empty">
+                Click a numbered corner on the circuit to inspect its
+                speed, braking demand, and tyre stress.
+              </p>
+            )}
           </div>
 
           <div className="strategy-message">
