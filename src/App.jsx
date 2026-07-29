@@ -135,7 +135,8 @@ export default function App() {
   const [trackTemp, setTrackTemp] = useState(35);
   const [selectedTurn, setSelectedTurn] = useState(null);
   const [currentLap, setCurrentLap] = useState(0);
-
+  const [wear, setWear] = useState(0);
+  const [lapHistory, setLapHistory] = useState([]);
   const [isSimulating, setIsSimulating] = useState(false);
 
   const MIN_ZOOM = 0.65;
@@ -197,14 +198,20 @@ export default function App() {
   const tempFactor =
     trackTemp > 40 ? 1.2 : trackTemp < 25 ? 0.9 : 1;
 
-  const wear =
-    laps *
-    trackData[track].factor *
-    compoundFactors[compound] *
-    weatherFactors[weather] *
-    tempFactor;
-
   const gripRemaining = Math.max(100 - wear, 0);
+  
+  const calculateLapWear = (lapNumber) => {
+    const baseWear = 
+      trackData[track].factor *
+      compoundFactors[compound] *
+      weatherFactors[weather] *
+      tempFactor *
+      2;
+   
+    const degradationGrowth = 1 +(lapNumber -1) * 0.06;
+    return baseWear * degradationGrowth;
+  };
+
   const ActiveTrackComponent = trackData[track].component;
   const selectedTurnData =
     track === "Bahrain" && selectedTurn
@@ -232,16 +239,21 @@ export default function App() {
   };
 
   const handleLapComplete = () => {
-    setCurrentLap((previousLap) => {
-      const nextLap = previousLap + 1;
+    const nextLap = currentLap +1;
+    const lapWear = calculateLapWear(nextLap);
 
-      if (nextLap >= laps) {
-        setIsSimulating(false);
-        return laps;
-      }
+    setWear((previousWear) =>
+        Math.min(previousWear + lapWear, 100)
+    );
    
-      return nextLap;
-    });
+    if (nextLap >= laps) {
+      setCurrentLap(laps);
+      setIsSimulating(false);
+      return;
+    }
+
+    setCurrentLap(nextLap);
+    
   };
 
   const handleWheel = (event) => {
@@ -416,6 +428,7 @@ export default function App() {
 		onClick={() => {
                   if (currentLap >= laps) {
 		    setCurrentLap(0);
+		    setWear(0);
 		  }
 
 		  setIsSimulating((current) => !current);
