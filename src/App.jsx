@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import "./App.css";
 import BahrainTrack from "./components/BahrainTrack";
-
+import WearChart from "./components/WearChart";
 
 const BAHRAIN_TURN_DATA = {
   1: {
@@ -508,6 +508,10 @@ export default function App() {
             )}
           </div>
         </section>
+
+	<section className="graph-section">
+	  <WearChart lapHistory={lapHistory} />
+	</section>
 
         <aside className="telemetry-panel">
           <div className="telemetry-heading">

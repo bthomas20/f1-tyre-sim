@@ -181,7 +181,23 @@ button {
   padding: 24px 40px 40px;
   display: grid;
   grid-template-columns: minmax(0, 1fr) 330px;
+  grid-template-areas:
+    "track telemetry"
+    "graph telemetry";
   gap: 22px;
+  align-items: start;
+}  
+
+.track-section {
+  grid-area:  track;
+}
+
+.graph-section {
+  grid-area:  graph;
+}
+
+.telemetry-panel {
+  grid-area: telemetry;
 }
 
 .track-section,
@@ -1005,4 +1021,20 @@ button {
 .lap-history {
    max-height:      250px;
    overflow-y:      auto;
+}
+
+.wear-chart {
+   margin-top:      18px;
+   padding:         16px;
+   background:      #111827;
+   border:          1px solid #26364d;
+   border-radius:   10px;
+}
+
+.wear-chart h3 {
+   margin:          0 0 12px;
+   color:           white;
+   text-transform:  uppercase;
+   letter-spacing:  1px;
+   font-size:       0.9rem;
 }
