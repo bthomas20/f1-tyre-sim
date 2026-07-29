@@ -239,17 +239,25 @@ export default function App() {
   };
 
   const handleLapComplete = () => {
-    const nextLap = currentLap +1;
+    const nextLap = currentLap + 1;
     const lapWear = calculateLapWear(nextLap);
+    const newWear = Math.min(wear + lapWear, 100);
 
-    setWear((previousWear) =>
-        Math.min(previousWear + lapWear, 100)
-    );
+    setWear(newWear);
+
+    setLapHistory((history) => [
+      ...history,
+      {
+         lap: nextLap,
+         wear: newWear,
+         grip: Math.max(100 - newWear, 0),
+      },
+   ]);
    
-    if (nextLap >= laps) {
-      setCurrentLap(laps);
-      setIsSimulating(false);
-      return;
+   if (nextLap >= laps) {
+     setCurrentLap(laps);
+     setIsSimulating(false);
+     return;
     }
 
     setCurrentLap(nextLap);
@@ -429,6 +437,7 @@ export default function App() {
                   if (currentLap >= laps) {
 		    setCurrentLap(0);
 		    setWear(0);
+		    setLapHistory([]);
 		  }
 
 		  setIsSimulating((current) => !current);
@@ -639,6 +648,30 @@ export default function App() {
                 "Grip loss is critical. A pit stop should be considered."}
             </p>
           </div>
+
+	  <div className="lap-history">
+	     <h3>Lap History</h3>
+
+	     <table>
+	       <thead>
+		 <tr>
+		   <th>Lap</th>
+		   <th>Wear</th>
+		   <th>Grip</th>
+		 </tr>
+	       </thead>
+
+	       <tbody>
+		 {lapHistory.map((lap) => (
+		   <tr key={lap.lap}>
+		      <td>{lap.lap}</td>
+		      <td>{lap.wear.toFixed(1)}%</td>
+		      <td>{lap.grip.toFixed(1)}%</td>
+		   </tr>
+		 ))}
+	      </tbody>
+	    </table>
+	  </div>	
         </aside>
       </main>
     </div>
