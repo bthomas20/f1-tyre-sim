@@ -1,11 +1,13 @@
 import {
+  ResponsiveContainer,
   LineChart,
   Line,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
-  ResponsiveContainer,
+  Legend,
+  ReferenceArea,
 } from "recharts";
 
 
@@ -26,7 +28,7 @@ export default function WearChart({ lapHistory}) {
 	  <YAxis
 	    domain={[0,100]}
 	    label={{
-	      value: "Wear %",
+	      value: "Percentage",
 	      angle: -90,
 	      position: "insideLeft",
 	    }}
@@ -34,12 +36,49 @@ export default function WearChart({ lapHistory}) {
 
 	  <Tooltip />
 
+	    formatter={(value) => [value.toFixed(1) + "%"]}
+
+	  <Legend />
+
+	  <ReferenceArea
+	    y1={70}
+	    y2={100}
+	    fill="#1f8f55"
+	    fillOpacity={0.12}
+	  />
+
+	  <ReferenceArea
+	    y1={40}
+	    y2={70}
+	    fill="#d4a017"
+	    fillOpacity={0.12}
+	  />
+
+	  <ReferenceArea
+	    y1={0}
+	    y2={40}
+	    fill="#c62828"
+	    fillOpacity={0.12}
+	  />
+
 	  <Line
-	    type="monotone"
+	    type="natural"
 	    dataKey="wear"
 	    stroke="#ff3b30"
 	    strokeWidth={3}
+	    dot={{ r: 4}}
+	    activeDot={{ r: 6}}
+	    name="Tyre Wear"
+	  />
+
+	  <Line
+	    type="natural"
+	    dataKey="grip"
+	    stroke="#34C759"
+	    strokeWidth={3}
 	    dot={{ r:4}}
+	    activeDot={{ r: 6}}
+	    name="Grip Remaining"
 	  />
         </LineChart>
       </ResponsiveContainer>
