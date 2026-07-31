@@ -135,6 +135,7 @@ export default function App() {
   const [trackTemp, setTrackTemp] = useState(35);
   const [selectedTurn, setSelectedTurn] = useState(null);
   const [currentLap, setCurrentLap] = useState(0);
+  const [lapProgress, setLapProgress] = useState(0);
   const [wear, setWear] = useState(0);
   const [lapHistory, setLapHistory] = useState([]);
   const [isSimulating, setIsSimulating] = useState(false);
@@ -520,6 +521,7 @@ export default function App() {
 	  <WearChart
 	     lapHistory={lapHistory}
 	     currentLap={currentLap}
+	     lapProgress={lapProgress}
 	  />
 	</section>
 

@@ -15,6 +15,7 @@ import {
 export default function WearChart({
   lapHistory,
   currentLap,
+  lapProgress,
 }) {
   return (
     <div className="wear-chart">

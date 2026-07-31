@@ -96,7 +96,6 @@ export default function BahrainTrack({
     };
   }, [onLapComplete]);
 
-
   return (
     <svg
       ref={svgRef}
@@ -156,16 +155,16 @@ export default function BahrainTrack({
       <path className="track-underlay" d={TRACK_PATH} />
 
       <path
-        id="bahrainCircuitPath"
-        className="track-main-line"
-        d={TRACK_PATH}
-        filter="url(#trackGlow)"
+	id="bahrainCircuitPath"
+	className="track-main-line"
+	d={TRACK_PATH}
+	filter="url(#trackGlow)"
       />
 
       <g className="start-finish" transform="translate(690 510)">
-        {Array.from({ length: 24 }).map((_, index) => {
-          const row = Math.floor(index / 6);
-          const column = index % 6;
+	{Array.from({ length: 24}).map((_, index) => {
+	  const row = Math.floor(index / 6);
+	  const column = index % 6;
 
           return (
             <rect
@@ -182,7 +181,7 @@ export default function BahrainTrack({
             />
           );
         })}
-      </g>
+       </g>
 
       <g className="direction-indicator" aria-label="Anti-clockwise direction">
         <line x1="678" y1="559" x2="615" y2="559" />

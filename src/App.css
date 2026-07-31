@@ -647,28 +647,34 @@ button {
 }
 
 .track-underlay {
-  fill: none;
-  stroke: rgba(80, 105, 136, 0.5);
-  stroke-width: 16;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+  fill:              none;
+  stroke:            #182332;
+  stroke-width:      20;
+  stroke-linecap:    round;
+  stroke-linejoin:   round;
+  filter:
+    drop-shadow(0 0 8px rgba(75, 105, 140, 0.45))
+    drop-shadow(0 0 18px rgba(20, 35, 55, 0.7));
 }
 
 .track-main-line {
-  fill: none;
-  stroke: url(#trackStroke);
-  stroke-width: 7;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+  fill:              none;
+  stroke:            url(#trackStroke);
+  stroke-width:      7;
+  stroke-linecap:    round;
+  stroke-linejoin:   round;
+  filter:
+    drop-shadow(0 0 4px rgba(255, 255, 255, 0.9))
+    frop-shadow(0 0 12px rgba(145, 190, 255, 0.55));
 }
 
 .turn-marker {
-  cursor: pointer;
-  outline: none;
+  cursor:            pointer;
+  outline:           none;
 }
 
 .turn-marker-hitbox {
-  fill: transparent;
+  fill:              transparent;
 }
 
 .turn-marker-ring {
@@ -725,6 +731,9 @@ button {
 
 .lap-car {
   pointer-events: none;
+  filter:
+    drop-shadow(0 0 4px rgba(225, 6, 0, 1))
+    drop-shadow(0 0 11px rgba(255, 6, 0, 0.85));
 }
 
 .lap-car-body {
@@ -1037,4 +1046,23 @@ button {
    text-transform:  uppercase;
    letter-spacing:  1px;
    font-size:       0.9rem;
+}
+
+.start-finish {
+  transform-box:    fill-box;
+  transform-origin: center;
+  animation:        finishLinePulse 1.8s ease-in-out infinite;
+}
+
+@keyframes finishLinePulse {
+  0%
+  100% {
+    opacity:    0.72;
+    filter:     drop-shadow(0 0 2px rgba(255, 255, 255, 0.25));
+  }
+
+  50% {
+    opacity: 1;
+    filter: drop-shadow(0 0 7px rgba(255, 255,255, 0.75));
+  }
 }
