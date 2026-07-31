@@ -212,6 +212,13 @@ export default function App() {
     return baseWear * degradationGrowth;
   };
 
+  const tyreTemp = 
+    Math.round(
+      trackTemp +
+      wear * 0.35 +
+      compoundFactors[compound] * 12
+    );
+
   const ActiveTrackComponent = trackData[track].component;
   const selectedTurnData =
     track === "Bahrain" && selectedTurn
@@ -510,7 +517,10 @@ export default function App() {
         </section>
 
 	<section className="graph-section">
-	  <WearChart lapHistory={lapHistory} />
+	  <WearChart
+	     lapHistory={lapHistory}
+	     currentLap={currentLap}
+	  />
 	</section>
 
         <aside className="telemetry-panel">
@@ -586,6 +596,12 @@ export default function App() {
               <span>Wear factor</span>
               <strong>{trackData[track].factor.toFixed(1)}x</strong>
             </div>
+
+	    <div className="data-box">
+	      <span>Tyre Temp</span>
+	      <strong>{tyreTemp}°C</strong>
+	    </div>
+
           </div>
 
           <div className="turn-analysis">

@@ -8,10 +8,14 @@ import {
   Tooltip,
   Legend,
   ReferenceArea,
+  ReferenceLine,
 } from "recharts";
 
 
-export default function WearChart({ lapHistory}) {
+export default function WearChart({
+  lapHistory,
+  currentLap,
+}) {
   return (
     <div className="wear-chart">
       <h3>Tyre Wear History</h3>
@@ -59,6 +63,18 @@ export default function WearChart({ lapHistory}) {
 	    y2={40}
 	    fill="#c62828"
 	    fillOpacity={0.12}
+	  />
+
+	  <ReferenceLine
+	    x={currentLap}
+            stroke="#ffffff"
+	    strokeWidth={2}
+	    strokeDasharray="6 6"
+	    label={{
+	       value: "Current Lap",
+	       position: "top",
+	       fill: "#ffffff",
+	    }}
 	  />
 
 	  <Line
