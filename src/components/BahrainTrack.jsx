@@ -181,69 +181,6 @@ export default function BahrainTrack({
       <rect width="960" height="600" className="svg-map-background" />
       <rect width="960" height="600" fill="url(#trackGrid)" />
 
-      <g className="bahrain-environment" pointerEvents="none">
-        <path
-          className="desert-runoff"
-	  d="
-	    M 35 40
-	    L 925 40
-	    L 925 565
-	    L 35 565
-	    Z
-	  "
-        />
-
-	<path
-	  className="service-road"
-	  d="
-	    M 55 555
-	    L 835 555
-	    C 880 555 915 530 925 490
-	  "
-	/>
-
-	<path
-	  className="pit-lane"
-	  d="
-	    M 470 565
-            L 805 565
-	    C 835 565 855 553 867 535
-	    L 815 535
-	    L 470 535
-	    Z
-	  "
-	/>
-
-	<g className="pit-building">
-	  <rect x="563" y="545" width="42" height="14" rx="2" />
-          <rect x="659" y="545" width="42" height="14" rx="2" />
-          <rect x="611" y="545" width="42" height="14" rx="2" />
-          <rect x="659" y="545" width="42" height="14" rx="2" />
-          <rect x="707" y="545" width="42" height="14" rx="2" />
-	</g>
-
-	<g className="floodlight-towers">
-	  <g transform="translate(145 110)">
-	    <line y1="0" y2="48" />
-	    <circle cy="-4" r="6" />
-	  </g>
-	
-	  <g transform="translate(640 70)">
-	    <line y1="0" y2="48" />
-	    <circle cy="-4" r="6" />
-	  </g>
-
-	  <g transform="translate(875 420)">
-	    <line y1="0" y2="48" />
-	    <circle cy="-4" r="6" />
-	  </g>
-
-	  <g transform="translate(330 520)">
-            <line y1="0" y2="48" />
-            <circle cy="-4" r="6" />
-	  </g>
-	</g>
-      </g>
 
       <path className="track-underlay" d={TRACK_PATH} />
 

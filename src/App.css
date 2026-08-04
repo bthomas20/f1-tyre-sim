@@ -287,17 +287,6 @@ button {
   overflow: hidden;
   cursor: grab;
   user-select: none;
-
-
-  background-position:
-    0 0,
-    17px 19px;
-
-  background-size:
-    36px 36px,
-    42px 42px;
-
-  opacity: 0.38;
 }
 
 
@@ -647,7 +636,7 @@ button {
 }
 
 .svg-map-background {
-  fill: #05080d;
+  fill: transparent;
 }
 
 .track-grid-dot {
@@ -656,13 +645,10 @@ button {
 
 .track-underlay {
   fill:              none;
-  stroke:            #182332;
-  stroke-width:      20;
+  stroke:            #263446;
+  stroke-width:      18;
   stroke-linecap:    round;
   stroke-linejoin:   round;
-  filter:
-    drop-shadow(0 0 8px rgba(75, 105, 140, 0.45))
-    drop-shadow(0 0 18px rgba(20, 35, 55, 0.7));
 }
 
 .track-main-line {
@@ -672,8 +658,8 @@ button {
   stroke-linecap:    round;
   stroke-linejoin:   round;
   filter:
-    drop-shadow(0 0 4px rgba(255, 255, 255, 0.9))
-    frop-shadow(0 0 12px rgba(145, 190, 255, 0.55));
+    drop-shadow(0 0 4px rgba(255, 255, 255, 0.95))
+    drop-shadow(0 0 12px rgba(145, 190, 255, 0.65));
 }
 
 .turn-marker {
@@ -1084,4 +1070,3 @@ button {
     opacity: 1;
   }
 }
-
