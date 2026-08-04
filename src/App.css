@@ -289,7 +289,37 @@ button {
   user-select: none;
 }
 
+.map-viewport::before {
+  content: "";
+  position: absolute;
+  inset: 0;
 
+  background-image: url("/flags/bahrain.svg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  opacity:  0.14;
+
+  pointer-events: none;
+  z-index: 0;
+}
+
+.map-viewpoint::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+
+  background-image:
+    radial-gradient(
+      circle,
+      rgba(116, 138, 166, 0.18) 1px
+      transparent 1.2px
+    );
+  background-size:  22px 22px;
+}
 
 .map-viewport.dragging {
   cursor: grabbing;
@@ -754,7 +784,7 @@ button {
 
 .map-corner::before,
 .map-corner::after {
-  content: "";
+  content: '';
   position: absolute;
   background: #e10600;
   box-shadow: 0 0 8px rgba(225, 6, 0, 0.45);
@@ -1070,3 +1100,4 @@ button {
     opacity: 1;
   }
 }
+

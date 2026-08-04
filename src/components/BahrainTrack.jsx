@@ -161,15 +161,6 @@ export default function BahrainTrack({
           </feMerge>
         </filter>
 
-        <pattern
-          id="trackGrid"
-          width="22"
-          height="22"
-          patternUnits="userSpaceOnUse"
-        >
-          <circle cx="1.2" cy="1.2" r="1.1" className="track-grid-dot" />
-        </pattern>
-
         <linearGradient id="trackStroke" x1="0" y1="0" x2="1" y2="1">
           <stop offset="0%" stopColor="#ffffff" />
           <stop offset="55%" stopColor="#dce7f5" />
@@ -178,10 +169,7 @@ export default function BahrainTrack({
 
       </defs>
 
-      <rect width="960" height="600" className="svg-map-background" />
-      <rect width="960" height="600" fill="url(#trackGrid)" />
-
-
+      
       <path className="track-underlay" d={TRACK_PATH} />
 
       <path
