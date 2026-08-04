@@ -50,14 +50,42 @@ const TURN_MARKERS = [
   { number: 15, x: 858, y: 547 },
 ];
 
+const TEAM_COLORS = {
+  Ferrari: {
+    primary:   "#e10600",
+    secondary: "#ffd200",
+  },
+  McLaren: {
+    primary:   "#ff8700",
+    secondary: "#47c7fc",
+  },
+  Mercedes: {
+    primary:   "#c8c8c8",
+    secondary: "#00d2be",
+  },
+  "Red Bull": {
+    primary:   "#1e41ff",
+    secondary: "#e10600",
+  },
+  "Aston Martin": {
+    primary:   "#006f62",
+    secondary: "#cedc00",
+  },
+  Williams: {
+    primary:   "#005aff",
+    secondary: "#ffffff",
+  },
+};
 export default function BahrainTrack({
   selectedTurn,
   onTurnSelect,
   isSimulating,
   onLapComplete,
+  team,
 }) {
   const svgRef = useRef(null)
   const animationRef = useRef(null)
+  const teamColors = TEAM_COLORS[team] ?? TEAM_COLORS.Ferrari;
 
   useEffect(() => {
     const svg = svgRef.current
@@ -147,10 +175,75 @@ export default function BahrainTrack({
           <stop offset="55%" stopColor="#dce7f5" />
           <stop offset="100%" stopColor="#ffffff" />
         </linearGradient>
+
       </defs>
 
       <rect width="960" height="600" className="svg-map-background" />
       <rect width="960" height="600" fill="url(#trackGrid)" />
+
+      <g className="bahrain-environment" pointerEvents="none">
+        <path
+          className="desert-runoff"
+	  d="
+	    M 35 40
+	    L 925 40
+	    L 925 565
+	    L 35 565
+	    Z
+	  "
+        />
+
+	<path
+	  className="service-road"
+	  d="
+	    M 55 555
+	    L 835 555
+	    C 880 555 915 530 925 490
+	  "
+	/>
+
+	<path
+	  className="pit-lane"
+	  d="
+	    M 470 565
+            L 805 565
+	    C 835 565 855 553 867 535
+	    L 815 535
+	    L 470 535
+	    Z
+	  "
+	/>
+
+	<g className="pit-building">
+	  <rect x="563" y="545" width="42" height="14" rx="2" />
+          <rect x="659" y="545" width="42" height="14" rx="2" />
+          <rect x="611" y="545" width="42" height="14" rx="2" />
+          <rect x="659" y="545" width="42" height="14" rx="2" />
+          <rect x="707" y="545" width="42" height="14" rx="2" />
+	</g>
+
+	<g className="floodlight-towers">
+	  <g transform="translate(145 110)">
+	    <line y1="0" y2="48" />
+	    <circle cy="-4" r="6" />
+	  </g>
+	
+	  <g transform="translate(640 70)">
+	    <line y1="0" y2="48" />
+	    <circle cy="-4" r="6" />
+	  </g>
+
+	  <g transform="translate(875 420)">
+	    <line y1="0" y2="48" />
+	    <circle cy="-4" r="6" />
+	  </g>
+
+	  <g transform="translate(330 520)">
+            <line y1="0" y2="48" />
+            <circle cy="-4" r="6" />
+	  </g>
+	</g>
+      </g>
 
       <path className="track-underlay" d={TRACK_PATH} />
 
@@ -188,16 +281,80 @@ export default function BahrainTrack({
         <polyline points="630,547 615,559 630,571" />
       </g>
 
-      <g className="lap-car" filter="url(#markerGlow)">
-        <path
-          className="lap-car-body"
-          d="M 12 0 L 5 -5 L -8 -5 L -13 -2 L -13 2 L -8 5 L 5 5 Z"
-        />
-        <rect className="lap-car-cockpit" x="-1" y="-3" width="6" height="6" rx="2" />
-        <rect className="lap-car-wheel" x="-8" y="-8" width="6" height="3" rx="1" />
-        <rect className="lap-car-wheel" x="-8" y="5" width="6" height="3" rx="1" />
-        <rect className="lap-car-wheel" x="4" y="-8" width="5" height="3" rx="1" />
-        <rect className="lap-car-wheel" x="4" y="5" width="5" height="3" rx="1" />
+      <g 
+	className="lap-car" 
+	filter="url(#markerGlow)"
+	transform="rotate(180)"
+      >
+
+	<rect
+	   x="-16"
+	   y="-9"
+	   width="4"
+	   height="18"
+	   rx="1"
+	   fill={teamColors.secondary}
+	/>
+
+	<path
+	   className="lap-car-body"
+	   fill={teamColors.primary}
+	   d="
+	     M 19 0
+	     C 16 -2 14 -3 11 -4
+	     L 7 -5
+	     L 3 -8
+	     L -4 -8
+	     L -7 -5
+	     L -13 -4
+	     L -13 4
+	     L -7 5
+	     L -4 8
+	     L 3 8
+	     L 7 5
+	     L 11 4
+	     C 14 3 16 2 19 0
+	     Z
+	   "
+	/>
+	
+	<rect
+	   x="9"
+	   y="-6"
+	   width="3"
+	   height="12"
+	   rx="1"
+	   fill={teamColors.secondary}
+	/>
+
+	<ellipse
+	   className="lap-car-cockpit"
+	      cx="0"
+	      cy="0"
+	      rx="4"
+	      ry="5"
+	      fill="#101722"
+	/>
+
+	<path
+	   d="M 4 0 L -8 0"
+	   stroke={teamColors.secondary}
+	   strokeWidth="2"
+	   strokeLinecap="round"
+	/>
+
+	<path
+	   d="M -2 -4 Q 1 0 -2 4"
+	   fill="none"
+	   stroke="#d7e0ea"
+	   strokeWidth="1.2"
+	   strokeLinecap="round"
+	/>
+
+	<rect className="lap-car-wheel" x="-10" y="-11" width="7" height="4" rx="1" />
+        <rect className="lap-car-wheel" x="-10" y="7" width="7" height="4" rx="1" />
+        <rect className="lap-car-wheel" x="6" y="-10" width="6" height="4" rx="1" />
+        <rect className="lap-car-wheel" x="6" y="6" width="6" height="4" rx="1" />
 
 	<animateMotion
 	   ref={animationRef}

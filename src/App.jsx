@@ -129,6 +129,7 @@ const BAHRAIN_TURN_DATA = {
 
 export default function App() {
   const [track, setTrack] = useState("Bahrain");
+  const [team, setTeam] = useState("Ferrari");
   const [compound, setCompound] = useState("Medium");
   const [laps, setLaps] = useState(10);
   const [weather, setWeather] = useState("Dry");
@@ -355,6 +356,23 @@ export default function App() {
           </select>
         </div>
 
+	<div className="filter-group">
+	  <label htmlFor="team">Team</label>
+
+	  <select
+	    id="team"
+	    value={team}
+            onChange={(event) => setTeam(event.target.value)}
+	  >
+	    <option value="Ferrari">Ferrari</option>
+            <option value="McLaren">McLaren</option>
+            <option value="Mercedes">Mercedes</option>
+            <option value="Red Bull">Red Bull</option>
+            <option value="Aston Martin">Aston Martin</option>
+            <option value="Williams">Williams</option>
+	  </select>
+	</div>
+
         <div className="filter-group">
           <label htmlFor="compound">Tyre compound</label>
           <select
@@ -476,6 +494,7 @@ export default function App() {
                   onTurnSelect={setSelectedTurn}
 		  isSimulating={isSimulating}
 		  onLapComplete={handleLapComplete}
+		  team={team}
                 />
               </div>
             ) : (

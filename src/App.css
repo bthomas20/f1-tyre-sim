@@ -287,14 +287,20 @@ button {
   overflow: hidden;
   cursor: grab;
   user-select: none;
-  background:
-    radial-gradient(
-      circle at center,
-      rgba(50, 61, 80, 0.22),
-      transparent 65%
-    ),
-    #05080d;
+
+
+  background-position:
+    0 0,
+    17px 19px;
+
+  background-size:
+    36px 36px,
+    42px 42px;
+
+  opacity: 0.38;
 }
+
+
 
 .map-viewport.dragging {
   cursor: grabbing;
@@ -629,6 +635,8 @@ button {
   place-items: center;
   transform-origin: center;
   transition: transform 0.08s linear;
+  position: relative;
+  z-index: 1;
 }
 
 .bahrain-track {
@@ -737,7 +745,6 @@ button {
 }
 
 .lap-car-body {
-  fill: #e10600;
   stroke: #ffffff;
   stroke-width: 1.2;
 }
@@ -748,7 +755,7 @@ button {
 
 .lap-car-wheel {
   fill: #05080d;
-  stroke: #ffffff;
+  stroke: #8fa2b8;
   stroke-width: 0.7;
 }
 
@@ -1066,3 +1073,15 @@ button {
     filter: drop-shadow(0 0 7px rgba(255, 255,255, 0.75));
   }
 }
+
+.bahrain=floodlights {
+  0%
+  100% {
+    opacity: 0.72;
+  }
+  
+  50% {
+    opacity: 1;
+  }
+}
+
