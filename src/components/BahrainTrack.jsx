@@ -186,6 +186,52 @@ export default function BahrainTrack({
 	    L 300 512
 	  "
 	/>
+
+	<g className="pit-building" pointerEvents="none">
+	    <rect
+	      x="300"
+	      y="450"
+	      width="470"
+	      height="34"
+	      rx="5"
+	      className="garage-building"
+	    />
+	    <rect
+	      x="300"
+	      y="450"
+	      width="470"
+	      height="5"
+	      className="garage-roof"
+	    />
+	    <line
+	      x1="300"
+	      y1="485"
+	      x2="770"
+	      y2="485"
+	      className="garage-shadow"
+	    />
+	    <g className="garage-dividers">
+	      {Array.from({ length: 10}, (_, index) => {
+		const buildingX = 300;
+		const buildingY = 450;
+		const buildingWidth = 470;
+		const buildingHeight = 34;
+		const dividerX = 
+		  buildingX + ((index + 1) * buildingWidth) / 11;
+
+		return (
+		  <line
+		    key={index}
+		    x1={dividerX}
+		    y1={buildingY}
+		    x2={dividerX}
+		    y2={buildingY + buildingHeight}
+		    className="garage-divider"
+		  />
+		);
+	      })}
+	    </g>
+	</g>
       </g>
 
       

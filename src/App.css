@@ -1119,4 +1119,23 @@ button {
   stroke-width: 2;
   stroke-linecap: round;
 }
+.garage-building {
+    fill:#20252d;
+    stroke:#58616f;
+    stroke-width:1.2;
+}
 
+.garage-roof{
+    fill:#485364;
+}
+
+.garage-shadow{
+    stroke:#11161f;
+    stroke-width:2;
+    opacity:.45;
+}
+
+.garage-divider {
+  stroke: rgba(255,255,255,.16);
+  stroke-width: 1;
+}
