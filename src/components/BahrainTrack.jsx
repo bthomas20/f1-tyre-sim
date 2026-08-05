@@ -169,6 +169,25 @@ export default function BahrainTrack({
 
       </defs>
 
+      <g className="pit-complex" pointerEvents="none">
+	<path
+	  className="pit-lane"
+	  d="
+	    M 835 514
+	    C 810 492 785 492 750 492
+	    L 320 492
+	    C 150 492 185 530 160 525
+	  "
+	/>
+	<path
+	  className="pit-divider"
+	  d="
+	    M 810 512
+	    L 300 512
+	  "
+	/>
+      </g>
+
       
       <path className="track-underlay" d={TRACK_PATH} />
 
