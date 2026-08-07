@@ -227,6 +227,20 @@ export default function App() {
     return baseWear * degradationGrowth;
   };
 
+  const calculateLapTime = (lapNumber, currentWear) => {
+    const baseLapTime = 92.5;
+
+  const wearPenalty = currentWear * 0.035;
+
+  const compoundPenalty = {
+    Soft: 0;
+    Medium: 0.7;
+    Hard: 1.4;
+  }[compound]
+
+  return baseLapTime + wearPenalty + compoundPenalty;
+  }
+
   const tyreTemp = 
     Math.round(
       trackTemp +
@@ -264,6 +278,7 @@ export default function App() {
     const nextLap = currentLap + 1;
     const lapWear = calculateLapWear(nextLap);
     const newWear = Math.min(wear + lapWear, 100);
+    const lapTime = calculateLapTime(nextLap, newWear);
 
     setWear(newWear);
 
@@ -273,6 +288,7 @@ export default function App() {
          lap: nextLap,
          wear: newWear,
          grip: Math.max(100 - newWear, 0),
+	 lapTime,
       },
    ]);
    
