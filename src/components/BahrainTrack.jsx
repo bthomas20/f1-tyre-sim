@@ -75,7 +75,43 @@ const TEAM_COLORS = {
     primary:   "#005aff",
     secondary: "#ffffff",
   },
+  Alpine: {
+    primary:   "#0090FF",
+    secondary: "#FF5BC8",
+  },
+  Haas: {
+    primary:   "#B6BABD",
+    secondary: "#E10600",
+  },
+  VCARB: {
+    primary:   "#6692FF",
+    secondary: "#FFFFFF",
+  },
+  Cadillac: {
+    primary:   "#7A36FF",
+    secondary: "#E6E6E6",
+  },
+  Audi: {
+    primary:   "#F50537",
+    secondary: "#C8CED4",
+  },
 };
+
+const PIT_TEAMS = [ 
+  { abbr: "MCL", color: "#FF8000" },
+  { abbr: "FER", color: "#E10600" },
+  { abbr: "MER", color: "#00D2BE" },
+  { abbr: "RBR", color: "#1E41FF" },
+  { abbr: "AST", color: "#006F62" },
+  { abbr: "ALP", color: "#0090FF" },
+  { abbr: "HASS", color: "#B6BABD" },
+  { abbr: "VCARB", color: "#6692FF" },
+  { abbr: "WIL", color: "#005AFF" },
+  { abbr: "AUDI", color: "#F50537" },
+  { abbr: "CAD", color: "#7A36FF" },
+];
+
+
 export default function BahrainTrack({
   selectedTurn,
   onTurnSelect,
@@ -192,7 +228,7 @@ export default function BahrainTrack({
 	      x="300"
 	      y="450"
 	      width="470"
-	      height="34"
+	      height="44"
 	      rx="5"
 	      className="garage-building"
 	    />
@@ -200,7 +236,7 @@ export default function BahrainTrack({
 	      x="300"
 	      y="450"
 	      width="470"
-	      height="5"
+	      height="50"
 	      className="garage-roof"
 	    />
 	    <line
@@ -231,6 +267,38 @@ export default function BahrainTrack({
 		);
 	      })}
 	    </g>
+
+	    <g className="garage-team-labels">
+		{PIT_TEAMS.map((team, index) => {
+		  const buildingX = 300;
+		  const buildingY = 450;
+		  const buildingWidth = 470;
+
+		  const bayWidth= buildingWidth / 11;
+		  const bayX = buildingX + index * bayWidth;
+
+		  return (
+		    <g key={team.abbr}>
+		      <rect
+			x={bayX}
+			y={468}
+			width={bayWidth}
+			height={3}
+			fill={team.color}
+		      />
+
+		      <text
+			x={bayX + bayWidth / 2}
+			y={463}
+			textAnchor="middle"
+			className="garage-team-text"
+		      >
+			{team.abbr}
+		      </text>
+		    </g>
+		  );
+		})}
+	      </g>
 	</g>
       </g>
 

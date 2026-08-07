@@ -126,6 +126,19 @@ const BAHRAIN_TURN_DATA = {
   },
 };
 
+const TEAMS = [
+  "McLaren",
+  "Ferrari",
+  "Mercedes",
+  "Red Bull",
+  "Aston Martin",
+  "Alpine",
+  "Haas",
+  "VCARB",
+  "Williams",
+  "Audi",
+  "Cadillac",
+];
 
 export default function App() {
   const [track, setTrack] = useState("Bahrain");
@@ -364,12 +377,11 @@ export default function App() {
 	    value={team}
             onChange={(event) => setTeam(event.target.value)}
 	  >
-	    <option value="Ferrari">Ferrari</option>
-            <option value="McLaren">McLaren</option>
-            <option value="Mercedes">Mercedes</option>
-            <option value="Red Bull">Red Bull</option>
-            <option value="Aston Martin">Aston Martin</option>
-            <option value="Williams">Williams</option>
+	    {TEAMS.map((team) => (
+	      <option key={team} value={team}>
+		{team}
+	      </option>
+	    ))}
 	  </select>
 	</div>
 
