@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import "./App.css";
 import BahrainTrack from "./components/BahrainTrack";
 import WearChart from "./components/WearChart";
+import RaceStatusBar from "./components/RaceStatusBar";
 
 const BAHRAIN_TURN_DATA = {
   1: {
@@ -573,6 +574,15 @@ export default function App() {
                 </div>
               </>
             )}
+	    <RaceStatusBar
+	      currentLap={currentLap}
+	      laps={laps}
+              compound={compound}
+	      wear={wear}
+	      grip={gripRemaining}
+	      latestLapTime={latestLapTime}
+	      formatLapTime={formatLapTime}
+	     />
           </div>
         </section>
 

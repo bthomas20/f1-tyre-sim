@@ -1149,3 +1149,44 @@ button {
   user-select: none;
   pointer-events: none;
 }
+
+.race-status-bar {
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  bottom: 20px;
+  
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 12px 20px;
+  
+  background: rgba(12, 18, 30, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+
+  backdrop-filter: blur(8px);
+  z-index: 50;
+}
+
+.status-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 90px;
+}
+
+.status-item span {
+  font-size: 0.7rem;
+  color: #8d9bb3;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.status-item strong {
+  margin-top: 4px;
+  color: white;
+  font-size: 1rem;
+  font-weigth: 700;
+}
