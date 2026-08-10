@@ -233,9 +233,9 @@ export default function App() {
   const wearPenalty = currentWear * 0.035;
 
   const compoundPenalty = {
-    Soft: 0;
-    Medium: 0.7;
-    Hard: 1.4;
+    Soft: 0,
+    Medium: 0.7,
+    Hard: 1.4,
   }[compound]
 
   return baseLapTime + wearPenalty + compoundPenalty;
@@ -354,6 +354,18 @@ export default function App() {
 
       return nextZoom;
     });
+  };
+
+  const latestLapTime =
+    lapHistory.length > 0
+      ? lapHistory[lapHistory.length -1].lapTime
+      : null;
+
+  const formatLapTime = (seconds) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+
+    return `${minutes}:${remainingSeconds.toFixed(3).padStart(6, "0")}`;
   };
 
   return (
@@ -649,6 +661,13 @@ export default function App() {
 	    <div className="data-box">
 	      <span>Tyre Temp</span>
 	      <strong>{tyreTemp}°C</strong>
+	    </div>
+
+	    <div className="data-box">
+	      <span>Last Lap</span>
+	      <strong>
+                {latestLapTime ? formatLapTime(latestLapTime)  : "--"}
+	      </strong>
 	    </div>
 
           </div>
