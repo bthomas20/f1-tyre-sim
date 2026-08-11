@@ -1,6 +1,7 @@
 export default function RaceStatusBar({
   currentLap,
   laps,
+  fuel,
   compound,
   wear,
   grip,
@@ -13,6 +14,11 @@ export default function RaceStatusBar({
       <div className="status-item">
         <span>Lap</span>
         <strong>{currentLap}/{laps}</strong>
+      </div>
+
+      <div className="status-item">
+	<span>FUEL</span>
+	<strong>{fuel.toFixed(1)}%</strong>
       </div>
 
       <div className="status-item">

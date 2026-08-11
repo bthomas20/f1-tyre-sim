@@ -154,6 +154,7 @@ export default function App() {
   const [wear, setWear] = useState(0);
   const [lapHistory, setLapHistory] = useState([]);
   const [isSimulating, setIsSimulating] = useState(false);
+  const [fuel, setFuel] = useState(100);
 
   const MIN_ZOOM = 0.65;
   const DEFAULT_ZOOM = 0.82;
@@ -228,18 +229,25 @@ export default function App() {
     return baseWear * degradationGrowth;
   };
 
-  const calculateLapTime = (lapNumber, currentWear) => {
+  const calculateLapTime = (lapNumber, currentWear, currentFuel) => {
     const baseLapTime = 92.5;
 
-  const wearPenalty = currentWear * 0.035;
+    const wearPenalty = currentWear * 0.02;
 
-  const compoundPenalty = {
-    Soft: 0,
-    Medium: 0.7,
-    Hard: 1.4,
-  }[compound]
+    const compoundPenalty = {
+      Soft: 0,
+      Medium: 0.7,
+      Hard: 1.4,
+    }[compound];
 
-  return baseLapTime + wearPenalty + compoundPenalty;
+    const fuelBonus = (100 - currentFuel) * 0.04;
+
+    return (
+      baseLapTime +
+      wearPenalty +
+      compoundPenalty -
+      fuelBonus
+    );
   }
 
   const tyreTemp = 
@@ -279,9 +287,17 @@ export default function App() {
     const nextLap = currentLap + 1;
     const lapWear = calculateLapWear(nextLap);
     const newWear = Math.min(wear + lapWear, 100);
-    const lapTime = calculateLapTime(nextLap, newWear);
+  
+    const fuelRemaining = Math.max(fuel - 2.5, 0);
+
+    const lapTime = calculateLapTime(
+      nextLap,
+      newWear,
+      fuelRemaining
+    );
 
     setWear(newWear);
+    setFuel(fuelRemaining);
 
     setLapHistory((history) => [
       ...history,
@@ -505,6 +521,7 @@ export default function App() {
 		    setCurrentLap(0);
 		    setWear(0);
 		    setLapHistory([]);
+		    setFuel(100);
 		  }
 
 		  setIsSimulating((current) => !current);
@@ -577,6 +594,7 @@ export default function App() {
 	    <RaceStatusBar
 	      currentLap={currentLap}
 	      laps={laps}
+	      fuel={fuel}
               compound={compound}
 	      wear={wear}
 	      grip={gripRemaining}
