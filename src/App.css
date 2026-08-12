@@ -1190,3 +1190,20 @@ button {
   font-size: 1rem;
   font-weigth: 700;
 }
+
+.map-controls .pit-button {
+  background: #ff8700;
+  border: 1px solid #ff8700;
+  color: white;
+}
+
+.map-controls .pit-button:hover:not):disabled) {
+  background: #ff9c2e;
+  background-color: #ff9c2e;
+}
+
+.map=controls .pit-button:disabled {
+  background: #3a3f4b;
+  border-color: #999;
+  color: #999;
+}

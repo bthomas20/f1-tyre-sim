@@ -7,6 +7,7 @@ export default function RaceStatusBar({
   grip,
   latestLapTime,
   formatLapTime,
+  isInPit,
 }) {
 
   return (
@@ -19,6 +20,11 @@ export default function RaceStatusBar({
       <div className="status-item">
 	<span>FUEL</span>
 	<strong>{fuel.toFixed(1)}%</strong>
+      </div>
+
+      <div className="status-item">
+	<span>STATUS</span>
+	<strong>{isInPit ? "PIT" : "TRACK"}</strong>
       </div>
 
       <div className="status-item">

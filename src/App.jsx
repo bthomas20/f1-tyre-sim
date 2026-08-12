@@ -128,17 +128,18 @@ const BAHRAIN_TURN_DATA = {
 };
 
 const TEAMS = [
-  "McLaren",
-  "Ferrari",
-  "Mercedes",
-  "Red Bull",
-  "Aston Martin",
-  "Alpine",
-  "Haas",
-  "VCARB",
-  "Williams",
-  "Audi",
-  "Cadillac",
+  { name: "McLaren", color: "#FF8700", garage: 1 },
+  { name: "Ferrari", color: "#DC0000", garage: 2 },
+  { name: "Mercedes", color: "#00D2BE", garage: 3 },
+  { name: "Red Bull", color: "#1E5BC6", garage: 4 },
+  { name: "Aston Martin", color: "#006F62", garage: 5 },
+  { name: "Alpine", color: "#FF87BC", garage: 6 },
+  { name: "Haas", color: "#B6BABD", garage: 7 },
+  { name: "VCARB", color: "#6692FF", garage: 8 },
+  { name: "Williams", color: "#005AFF", garage: 9 },
+  { name: "Audi", color: "#C0C0C0", garage: 10 },
+  { name: "Cadillac", color: "#003DA5", garage: 11 },
+
 ];
 
 export default function App() {
@@ -155,7 +156,9 @@ export default function App() {
   const [lapHistory, setLapHistory] = useState([]);
   const [isSimulating, setIsSimulating] = useState(false);
   const [fuel, setFuel] = useState(100);
-
+  const [isInPit, setIsInPit] =useState(false);
+  const [pitRequested, setPitRequested] = useState(false);
+  
   const MIN_ZOOM = 0.65;
   const DEFAULT_ZOOM = 0.82;
   const MAX_ZOOM = 2.5;
@@ -271,6 +274,8 @@ export default function App() {
 
   const getCompoundClass = () => compound.toLowerCase();
 
+  const getTeam = (teamName) =>
+    TEAMS.find((team) => team.name === teamName);
 
   const resetMap = () => {
     setZoom(DEFAULT_ZOOM);
@@ -285,6 +290,10 @@ export default function App() {
 
   const handleLapComplete = () => {
     const nextLap = currentLap + 1;
+    if (pitRequested) {
+      setIsInPit(true);
+      setPitRequested(false);
+    }
     const lapWear = calculateLapWear(nextLap);
     const newWear = Math.min(wear + lapWear, 100);
   
@@ -423,8 +432,8 @@ export default function App() {
             onChange={(event) => setTeam(event.target.value)}
 	  >
 	    {TEAMS.map((team) => (
-	      <option key={team} value={team}>
-		{team}
+	      <option key={team.name} value={team.name}>
+		{team.name}
 	      </option>
 	    ))}
 	  </select>
@@ -529,6 +538,15 @@ export default function App() {
 	      >
 		{isSimulating ? "Stop" : "Start"}
 	      </button>
+
+	      <button
+		type="button"
+		className="pit-button"
+		onClick={() => setPitRequested(true)}
+		disabled={isInPit || pitRequested}
+	      >
+		Request Pit
+	      </button>
             </div>
           </div>
 
@@ -600,6 +618,7 @@ export default function App() {
 	      grip={gripRemaining}
 	      latestLapTime={latestLapTime}
 	      formatLapTime={formatLapTime}
+	      isInPit={isInPit}
 	     />
           </div>
         </section>
