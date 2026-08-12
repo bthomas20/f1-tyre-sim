@@ -571,6 +571,7 @@ export default function App() {
 		  isSimulating={isSimulating}
 		  onLapComplete={handleLapComplete}
 		  team={team}
+		  isInPit={isInPit}
                 />
               </div>
             ) : (

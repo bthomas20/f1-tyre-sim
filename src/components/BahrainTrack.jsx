@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const TRACK_PATH = `
   M 88 530
@@ -118,47 +118,90 @@ export default function BahrainTrack({
   isSimulating,
   onLapComplete,
   team,
+  isInPit,
 }) {
   const svgRef = useRef(null)
-  const animationRef = useRef(null)
+  const circuitPathRef = useRef(null)
+  const frameRef = useRef(null);
+  const lastTimeRef = useRef(null);
+  const lapProgressRef = useRef(0);
+  const [carTransform, setCarTransform] = useState(
+    "translate(690 530) rotate(180)");  
+
   const teamColors = TEAM_COLORS[team] ?? TEAM_COLORS.Ferrari;
 
   useEffect(() => {
-    const svg = svgRef.current
+    if (!isSimulating) {
+      if(frameRef.current) {
+	cancelAnimationFrame(frameRef.current);
+      }
 
-    if (!svg) return;
-
-    if (isSimulating) {
-      svg.unpauseAnimations();
-    } else {
-      svg.pauseAnimations();
+      lastTimeRef.current = null;
+      return;
     }
-  }, [isSimulating]);
 
-  useEffect(() => {
-    const svg = svgRef.current
+    const path = circuitPathRef.current;
 
-    if (!svg) return;
+    if (!path) return;
 
-    svg.setCurrentTime(0);
-    svg.pauseAnimations();
-  }, []);
+    const totalLength = path.getTotalLength();
+    const lapDuration = 11000;
+    const startProgress = 0.2;
 
-  useEffect(() => {
-    const animation = animationRef.current;
+    const animate = (time) => {
+      if (lastTimeRef.current === null) {
+        lastTimeRef.current = time;
+      }
 
-    if (!animation || !onLapComplete) return;
+    const delta = time - lastTimeRef.current;
+    lastTimeRef.current = time;
 
-    const handleRepeat = () => {
-      onLapComplete();
-    };
-  
-    animation.addEventListener("repeatEvent", handleRepeat);
+    lapProgressRef.current -= delta / lapDuration;
 
-    return () => {
-       animation.removeEventListener("repeatEvent", handleRepeat);
-    };
-  }, [onLapComplete]);
+    if (lapProgressRef.current <= 1) {
+      lapProgressRef.current += 1;
+
+      if (onLapComplete) {
+	onLapComplete();
+      }
+    }
+
+    const pathProgress = 
+      (startProgress + lapProgressRef.current + 1) % 1;
+
+    const distance = pathProgress * totalLength;
+
+    const point = path.getPointAtLength(distance);
+
+    const nextDistance = 
+      (distance + 2) % totalLength;
+
+    const nextPoint = 
+      path.getPointAtLength(nextDistance);
+
+    const angle = 
+      Math.atan2(
+	nextPoint.y -point.y,
+        nextPoint.x -point.x
+      ) *
+      (180 / Math.PI);
+
+    setCarTransform(
+      `translate(${point.x} ${point.y}) rotate(${angle + 180})`
+    );
+
+    frameRef.current = requestAnimationFrame(animate);
+  };
+
+  frameRef.current = requestAnimationFrame(animate);
+
+  return () => {
+    if(frameRef.current) {
+      cancelAnimationFrame(frameRef.current);
+    }
+  }
+}, [isSimulating, onLapComplete]);
+
 
   return (
     <svg
@@ -207,6 +250,7 @@ export default function BahrainTrack({
 
       <g className="pit-complex" pointerEvents="none">
 	<path
+	  id="bahrainPitPath"
 	  className="pit-lane"
 	  d="
 	    M 835 514
@@ -306,6 +350,7 @@ export default function BahrainTrack({
       <path className="track-underlay" d={TRACK_PATH} />
 
       <path
+	ref={circuitPathRef}
 	id="bahrainCircuitPath"
 	className="track-main-line"
 	d={TRACK_PATH}
@@ -342,7 +387,7 @@ export default function BahrainTrack({
       <g 
 	className="lap-car" 
 	filter="url(#markerGlow)"
-	transform="rotate(180)"
+	transform={carTransform}
       >
 
 	<rect
@@ -413,18 +458,6 @@ export default function BahrainTrack({
         <rect className="lap-car-wheel" x="-10" y="7" width="7" height="4" rx="1" />
         <rect className="lap-car-wheel" x="6" y="-10" width="6" height="4" rx="1" />
         <rect className="lap-car-wheel" x="6" y="6" width="6" height="4" rx="1" />
-
-	<animateMotion
-	   ref={animationRef}
-	   dur="11s"
-	   repeatCount="indefinite"
-           rotate="auto"
-           keyPoints="0.2;0;1;0.2"
-           keyTimes="0;0.2;0.2;1"
-           calcMode="linear"
-         >
-           <mpath href="#bahrainCircuitPath" />
-         </animateMotion>
 
       </g>
 
