@@ -158,6 +158,7 @@ export default function App() {
   const [fuel, setFuel] = useState(100);
   const [isInPit, setIsInPit] =useState(false);
   const [pitRequested, setPitRequested] = useState(false);
+  const [resetKey, setResetKey] = useState(0);
   
   const MIN_ZOOM = 0.65;
   const DEFAULT_ZOOM = 0.82;
@@ -280,6 +281,26 @@ export default function App() {
   const resetMap = () => {
     setZoom(DEFAULT_ZOOM);
     setPosition({ x: 0, y: 0 });
+  };
+
+  const resetSimulation = () => {
+    setIsSimulating(false);
+
+    setCurrentLap(0);
+    setCurrentLap(0);
+    setWear(0);
+    setFuel(100);
+    setLapHistory([]);
+
+    setIsInPit(false);
+    setPitRequested(false);
+
+    setSelectedTurn(null);
+   
+    setZoom(DEFAULT_ZOOM);
+    setPosition({ x: 0, y: 0});
+
+    setResetKey((current) => current + 1);
   };
 
   const handleTrackChange = (event) => {
@@ -520,7 +541,7 @@ export default function App() {
               <button
                 type="button"
                 className="reset-button"
-                onClick={resetMap}
+                onClick={resetSimulation}
               >
                 Reset
               </button>
@@ -569,6 +590,7 @@ export default function App() {
                 }}
               >
                 <ActiveTrackComponent
+                  key={resetKey}
                   selectedTurn={selectedTurn}
                   onTurnSelect={setSelectedTurn}
 		  isSimulating={isSimulating}
