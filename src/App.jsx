@@ -394,6 +394,9 @@ export default function App() {
     return `${minutes}:${remainingSeconds.toFixed(3).padStart(6, "0")}`;
   };
 
+  const selectedTeam = getTeam(team);
+
+
   return (
     <div className="app">
       <header className="top-header">
@@ -572,6 +575,7 @@ export default function App() {
 		  onLapComplete={handleLapComplete}
 		  team={team}
 		  isInPit={isInPit}
+		  garage={selectedTeam?.garage ?? 1}
                 />
               </div>
             ) : (

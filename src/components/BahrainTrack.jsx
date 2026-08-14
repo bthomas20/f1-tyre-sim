@@ -119,17 +119,57 @@ export default function BahrainTrack({
   onLapComplete,
   team,
   isInPit,
+  garage,
 }) {
-  const svgRef = useRef(null)
-  const circuitPathRef = useRef(null)
+  const svgRef = useRef(null);
+  const circuitPathRef = useRef(null);
+  const pitPathRef = useRef(null);
   const frameRef = useRef(null);
   const lastTimeRef = useRef(null);
   const lapProgressRef = useRef(0);
+  const pitProgressRef = useRef(0);
   const [carTransform, setCarTransform] = useState(
     "translate(690 530) rotate(180)");  
 
   const teamColors = TEAM_COLORS[team] ?? TEAM_COLORS.Ferrari;
 
+  const findGarageProgress = (path, garageNumber) => {
+    const buildingX = 300;
+    const buildingWidth = 470;
+    const bayWidth = buildingWidth / 11;
+
+    const targetX = 
+      buildingX + (garageNumber -0.5) * bayWidth;
+
+    const targetY = 492;
+
+    const totalLength = path.getTotalLength();
+
+    let closestProgress = 0;
+    let closestDistance = Infinity;
+
+    for (let i=0; i<= 300; i++) {
+      const progress = i/300;
+      const point = path.getPointAtLength(progress * totalLength);
+     
+      const distance = Math.hypot(
+        point.x -targetX,
+        point.y -targetY
+      );
+
+      if (distance < closestDistance) {
+        closestDistance = distance;
+        closestProgress = progress;
+      }
+    }
+    return closestProgress;
+  };
+  useEffect(() => {
+    if (isInPit) { 
+      pitProgressRef.current = 0;
+    }
+  }, [isInPit]);
+  
   useEffect(() => {
     if (!isSimulating) {
       if(frameRef.current) {
@@ -140,13 +180,21 @@ export default function BahrainTrack({
       return;
     }
 
-    const path = circuitPathRef.current;
+    const circuitPath = circuitPathRef.current;
+    const pitPath = pitPathRef.current;
 
-    if (!path) return;
+    if (!circuitPath || !pitPath) return;
+
+    const path = isInPit ? pitPath : circuitPath;
 
     const totalLength = path.getTotalLength();
     const lapDuration = 11000;
+    const pitDuration = 4000;
     const startProgress = 0.2;
+
+    const garageProgress = isInPit
+      ? findGarageProgress(pitPath, garage)
+      : 1;
 
     const animate = (time) => {
       if (lastTimeRef.current === null) {
@@ -156,19 +204,30 @@ export default function BahrainTrack({
     const delta = time - lastTimeRef.current;
     lastTimeRef.current = time;
 
-    lapProgressRef.current -= delta / lapDuration;
+    let pathProgress;
 
-    if (lapProgressRef.current <= 1) {
-      lapProgressRef.current += 1;
+    if (isInPit) {
+      pitProgressRef.current += delta / pitDuration;
 
-      if (onLapComplete) {
-	onLapComplete();
+      pathProgress = Math.min(
+	pitProgressRef.current,
+	garageProgress
+      );
+
+    } else {
+      lapProgressRef.current -= delta / lapDuration;
+
+      if (lapProgressRef.current <= -1) {
+        lapProgressRef.current += 1;
+
+        if (onLapComplete) {
+	  onLapComplete();
+        }
       }
+
+      pathProgress = 
+        (startProgress + lapProgressRef.current + 1) % 1;
     }
-
-    const pathProgress = 
-      (startProgress + lapProgressRef.current + 1) % 1;
-
     const distance = pathProgress * totalLength;
 
     const point = path.getPointAtLength(distance);
@@ -200,7 +259,7 @@ export default function BahrainTrack({
       cancelAnimationFrame(frameRef.current);
     }
   }
-}, [isSimulating, onLapComplete]);
+}, [isSimulating, isInPit, garage, onLapComplete]);
 
 
   return (
@@ -250,6 +309,7 @@ export default function BahrainTrack({
 
       <g className="pit-complex" pointerEvents="none">
 	<path
+	  ref={pitPathRef}
 	  id="bahrainPitPath"
 	  className="pit-lane"
 	  d="
