@@ -120,6 +120,8 @@ export default function BahrainTrack({
   team,
   isInPit,
   garage,
+  onPitStopComplete,
+  onPitExit,
 }) {
   const svgRef = useRef(null);
   const circuitPathRef = useRef(null);
@@ -128,6 +130,10 @@ export default function BahrainTrack({
   const lastTimeRef = useRef(null);
   const lapProgressRef = useRef(0);
   const pitProgressRef = useRef(0);
+  const pitStopStartRef = useRef(null);
+  const pitStopDoneRef = useRef(false);
+  const pitStopFinishedRef = useRef(false);
+  const pitExitDoneRef = useRef(false);
   const [carTransform, setCarTransform] = useState(
     "translate(690 530) rotate(180)");  
 
@@ -161,15 +167,50 @@ export default function BahrainTrack({
         closestDistance = distance;
         closestProgress = progress;
       }
+     }
+     return closestProgress;
+  };
+
+  const findCircuitRejoinProgress = (circuitPath, pitPath) => {
+    const pitLength = pitPath.getTotalLength();
+    const pitExit = pitPath.getPointAtLength(pitLength);
+
+    const circuitLength = circuitPath.getTotalLength();
+
+    let closestProgress = 0;
+    let closestDistance = Infinity;
+
+    for (let i = 0; i <= 500; i++) {
+      const progress = i /500;
+
+      const point =
+	circuitPath.getPointAtLength(
+	  progress * circuitLength
+	);
+
+      const distance = Math.hypot(
+	point.x - pitExit.x,
+	point.y - pitExit.y
+      );
+
+      if (distance < closestDistance) {
+	closestDistance = distance;
+	closestProgress = progress;
+      }
     }
     return closestProgress;
   };
-  useEffect(() => {
-    if (isInPit) { 
+
+ useEffect(() => {
+    if (isInPit) {
       pitProgressRef.current = 0;
+      pitStopStartRef.current = null;
+      pitStopDoneRef.current = false;
+      pitStopFinishedRef.current = false;
+      pitExitDoneRef.current = false;
     }
   }, [isInPit]);
-  
+
   useEffect(() => {
     if (!isSimulating) {
       if(frameRef.current) {
@@ -207,13 +248,54 @@ export default function BahrainTrack({
     let pathProgress;
 
     if (isInPit) {
-      pitProgressRef.current += delta / pitDuration;
+      if(!pitStopFinishedRef.current) {
+        pitProgressRef.current += delta / pitDuration;
 
-      pathProgress = Math.min(
-	pitProgressRef.current,
-	garageProgress
-      );
+        if (pitProgressRef.current >= garageProgress) { 
+          pitProgressRef.current = garageProgress;
+          pathProgress = garageProgress;
 
+          if (pitStopStartRef.current == null) {
+	    pitStopStartRef.current = time;
+	  }
+
+	  const stoppedFor = time - pitStopStartRef.current;
+
+	  if (stoppedFor >= 2500 && !pitStopDoneRef.current) {
+	    pitStopDoneRef.current = true;
+	    pitStopFinishedRef.current = true;
+
+	    if (onPitStopComplete) {
+	      onPitStopComplete();
+	    }
+	  }
+        } else {
+	    pathProgress = pitProgressRef.current;
+        }
+      } else {
+        pitProgressRef.current += delta / pitDuration;
+        
+        pathProgress = Math.min(
+          pitProgressRef.current,
+	  1
+	);
+        if (
+	  pitProgressRef.current >= 1 &&
+	  !pitExitDoneRef.current
+	) {
+	  pitExitDoneRef.current = true;
+
+	  const rejoinProgress = 
+	    findCircuitRejoinProgress(circuitPath, pitPath);
+	  
+	  lapProgressRef.current = 
+	    rejoinProgress - startProgress;
+
+	  if (onPitExit) {
+	    onPitExit();
+	  }
+	}
+      }
     } else {
       lapProgressRef.current -= delta / lapDuration;
 
@@ -221,7 +303,7 @@ export default function BahrainTrack({
         lapProgressRef.current += 1;
 
         if (onLapComplete) {
-	  onLapComplete();
+          onLapComplete();
         }
       }
 
@@ -259,7 +341,14 @@ export default function BahrainTrack({
       cancelAnimationFrame(frameRef.current);
     }
   }
-}, [isSimulating, isInPit, garage, onLapComplete]);
+}, [
+   isSimulating, 
+   isInPit, 
+   garage, 
+   onLapComplete,
+   onPitStopComplete,
+   onPitExit,
+]);
 
 
   return (

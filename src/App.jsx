@@ -417,6 +417,14 @@ export default function App() {
 
   const selectedTeam = getTeam(team);
 
+  const handlePitStopComplete = () => {
+    setWear(0);
+    setLapHistory([]);
+  };
+
+  const handlePitExit = () => {
+    setIsInPit(false);
+  };
 
   return (
     <div className="app">
@@ -595,7 +603,9 @@ export default function App() {
                   onTurnSelect={setSelectedTurn}
 		  isSimulating={isSimulating}
 		  onLapComplete={handleLapComplete}
+		  onPitStopComplete={handlePitStopComplete}
 		  team={team}
+                  onPitExit={handlePitExit}
 		  isInPit={isInPit}
 		  garage={selectedTeam?.garage ?? 1}
                 />
