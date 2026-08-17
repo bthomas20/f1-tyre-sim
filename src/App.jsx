@@ -146,6 +146,7 @@ export default function App() {
   const [track, setTrack] = useState("Bahrain");
   const [team, setTeam] = useState("Ferrari");
   const [compound, setCompound] = useState("Medium");
+  const [nextCompound, setNextCompound] = useState("Medium");
   const [laps, setLaps] = useState(10);
   const [weather, setWeather] = useState("Dry");
   const [trackTemp, setTrackTemp] = useState(35);
@@ -418,6 +419,7 @@ export default function App() {
   const selectedTeam = getTeam(team);
 
   const handlePitStopComplete = () => {
+    setCompound(nextCompound);
     setWear(0);
     setLapHistory([]);
   };
@@ -472,11 +474,11 @@ export default function App() {
 	</div>
 
         <div className="filter-group">
-          <label htmlFor="compound">Tyre compound</label>
+          <label htmlFor="compound">Next Pit Tyre</label>
           <select
             id="compound"
-            value={compound}
-            onChange={(event) => setCompound(event.target.value)}
+            value={nextCompound}
+            onChange={(event) => setNextCompound(event.target.value)}
           >
             <option value="Soft">Soft</option>
             <option value="Medium">Medium</option>
