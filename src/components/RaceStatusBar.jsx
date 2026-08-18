@@ -7,7 +7,7 @@ export default function RaceStatusBar({
   grip,
   latestLapTime,
   formatLapTime,
-  isInPit,
+  pitPhase,
 }) {
 
   return (
@@ -24,7 +24,7 @@ export default function RaceStatusBar({
 
       <div className="status-item">
 	<span>STATUS</span>
-	<strong>{isInPit ? "PIT" : "TRACK"}</strong>
+	<strong>{pitPhase}</strong>
       </div>
 
       <div className="status-item">

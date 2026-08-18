@@ -159,6 +159,7 @@ export default function App() {
   const [fuel, setFuel] = useState(100);
   const [isInPit, setIsInPit] =useState(false);
   const [pitRequested, setPitRequested] = useState(false);
+  const [pitPhase, setPitPhase] = useState("TRACK");
   const [resetKey, setResetKey] = useState(0);
   
   const MIN_ZOOM = 0.65;
@@ -295,6 +296,7 @@ export default function App() {
 
     setIsInPit(false);
     setPitRequested(false);
+    setPitPhase("TRACK");
 
     setSelectedTurn(null);
    
@@ -315,6 +317,7 @@ export default function App() {
     if (pitRequested) {
       setIsInPit(true);
       setPitRequested(false);
+      setPitPhase("PIT ENTRY");
     }
     const lapWear = calculateLapWear(nextLap);
     const newWear = Math.min(wear + lapWear, 100);
@@ -426,6 +429,7 @@ export default function App() {
 
   const handlePitExit = () => {
     setIsInPit(false);
+    setPitPhase("TRACK");
   };
 
   return (
@@ -576,7 +580,10 @@ export default function App() {
 	      <button
 		type="button"
 		className="pit-button"
-		onClick={() => setPitRequested(true)}
+		onClick={() => {
+		  setPitRequested(true);
+		  setPitPhase("PIT REQUESTED");
+		}}
 		disabled={isInPit || pitRequested}
 	      >
 		Request Pit
@@ -608,6 +615,8 @@ export default function App() {
 		  onPitStopComplete={handlePitStopComplete}
 		  team={team}
                   onPitExit={handlePitExit}
+		  onPitPhaseChange={setPitPhase}
+		  pitPhase={pitPhase}
 		  isInPit={isInPit}
 		  garage={selectedTeam?.garage ?? 1}
                 />
@@ -657,7 +666,7 @@ export default function App() {
 	      grip={gripRemaining}
 	      latestLapTime={latestLapTime}
 	      formatLapTime={formatLapTime}
-	      isInPit={isInPit}
+	      pitPhase={pitPhase}
 	     />
           </div>
         </section>

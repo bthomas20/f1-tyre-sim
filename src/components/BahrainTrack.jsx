@@ -121,6 +121,7 @@ export default function BahrainTrack({
   isInPit,
   garage,
   onPitStopComplete,
+  onPitPhaseChange,
   onPitExit,
 }) {
   const svgRef = useRef(null);
@@ -255,8 +256,12 @@ export default function BahrainTrack({
           pitProgressRef.current = garageProgress;
           pathProgress = garageProgress;
 
-          if (pitStopStartRef.current == null) {
+          if (pitStopStartRef.current === null) {
 	    pitStopStartRef.current = time;
+
+	    if (onPitPhaseChange) {
+	      onPitPhaseChange("PIT STOP");
+	    }
 	  }
 
 	  const stoppedFor = time - pitStopStartRef.current;
@@ -267,6 +272,10 @@ export default function BahrainTrack({
 
 	    if (onPitStopComplete) {
 	      onPitStopComplete();
+	    }
+	    
+	    if (onPitPhaseChange) {
+	      onPitPhaseChange("PIT EXIT");
 	    }
 	  }
         } else {
@@ -340,15 +349,16 @@ export default function BahrainTrack({
     if(frameRef.current) {
       cancelAnimationFrame(frameRef.current);
     }
-  }
-}, [
+  };
+  }, [
    isSimulating, 
    isInPit, 
    garage, 
    onLapComplete,
    onPitStopComplete,
    onPitExit,
-]);
+   onPitPhaseChange,
+  ]);
 
 
   return (
