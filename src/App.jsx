@@ -160,6 +160,7 @@ export default function App() {
   const [isInPit, setIsInPit] =useState(false);
   const [pitRequested, setPitRequested] = useState(false);
   const [pitPhase, setPitPhase] = useState("TRACK");
+  const [pitLossPending, setPitLossPending] = useState(false);
   const [resetKey, setResetKey] = useState(0);
   
   const MIN_ZOOM = 0.65;
@@ -297,6 +298,7 @@ export default function App() {
     setIsInPit(false);
     setPitRequested(false);
     setPitPhase("TRACK");
+    setPitLossPending(false);
 
     setSelectedTurn(null);
    
@@ -318,17 +320,21 @@ export default function App() {
       setIsInPit(true);
       setPitRequested(false);
       setPitPhase("PIT ENTRY");
+      setPitLossPending(true);
     }
     const lapWear = calculateLapWear(nextLap);
     const newWear = Math.min(wear + lapWear, 100);
   
     const fuelRemaining = Math.max(fuel - 2.5, 0);
 
-    const lapTime = calculateLapTime(
+    const normalLapTime = calculateLapTime(
       nextLap,
       newWear,
       fuelRemaining
     );
+
+    const pitLoss = pitLossPending ? 22.0: 0;
+    const lapTime = normalLapTime +pitLoss;
 
     setWear(newWear);
     setFuel(fuelRemaining);
@@ -343,6 +349,10 @@ export default function App() {
       },
    ]);
    
+   if (pitLossPending) {
+     setPitLossPending(false);
+   }
+
    if (nextLap >= laps) {
      setCurrentLap(laps);
      setIsSimulating(false);
