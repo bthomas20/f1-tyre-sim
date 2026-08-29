@@ -50,6 +50,33 @@ const TURN_MARKERS = [
   { number: 15, x: 858, y: 547 },
 ];
 
+const buildTurnProgressMap = (path) => {
+  const totalLength = path.getTotalLength();
+  const turnProgressMap = {};
+
+  TURN_MARKERS.forEach((turn) => {
+    let closestProgress = 0;
+    let closestDistance = Infinity;
+
+    for (let i = 0; i <= 1000; i++) {
+      const progress = i / 1000;
+      const point = path.getPointAtLength(progress * totalLength);
+
+      const distance = Math.hypot(
+        point.x - turn.x,
+        point.y - turn.y
+        );
+        
+      if (distance < closestDistance) {
+        closestDistance = distance;
+        closestProgress = progress;
+      }
+    }
+    turnProgressMap[turn.number] = closestProgress;
+  });
+  return turnProgressMap;
+};
+
 const TEAM_COLORS = {
   Ferrari: {
     primary:   "#e10600",
@@ -117,6 +144,8 @@ export default function BahrainTrack({
   onTurnSelect,
   isSimulating,
   onLapComplete,
+  onSpeedChange,
+  turnData,
   team,
   isInPit,
   garage,
@@ -128,6 +157,7 @@ export default function BahrainTrack({
   const circuitPathRef = useRef(null);
   const pitPathRef = useRef(null);
   const frameRef = useRef(null);
+  const movementSpeedRef = useRef(320);
   const lastTimeRef = useRef(null);
   const lapProgressRef = useRef(0);
   const pitProgressRef = useRef(0);
@@ -135,6 +165,12 @@ export default function BahrainTrack({
   const pitStopDoneRef = useRef(false);
   const pitStopFinishedRef = useRef(false);
   const pitExitDoneRef = useRef(false);
+  const onLapCompleteRef = useRef(onLapComplete);
+  const onPitStopCompleteRef = useRef(onPitStopComplete);
+  const onPitExitRef = useRef(onPitExit);
+  const onPitPhaseChangeRef = useRef(onPitPhaseChange);
+  const onSpeedChangeRef = useRef(onSpeedChange);
+  const turnProgressMapRef = useRef(null);
   const [carTransform, setCarTransform] = useState(
     "translate(690 530) rotate(180)");  
 
@@ -227,10 +263,14 @@ export default function BahrainTrack({
 
     if (!circuitPath || !pitPath) return;
 
+    if (!turnProgressMapRef.current) {
+      turnProgressMapRef.current = buildTurnProgressMap(circuitPath);
+    }
+
     const path = isInPit ? pitPath : circuitPath;
 
     const totalLength = path.getTotalLength();
-    const lapDuration = 11000;
+    const lapDuration = 14000;
     const pitDuration = 4000;
     const startProgress = 0.2;
 
@@ -259,8 +299,8 @@ export default function BahrainTrack({
           if (pitStopStartRef.current === null) {
 	    pitStopStartRef.current = time;
 
-	    if (onPitPhaseChange) {
-	      onPitPhaseChange("PIT STOP");
+	    if (onPitPhaseChangeRef.current) {
+	      onPitPhaseChangeRef.current("PIT STOP");
 	    }
 	  }
 
@@ -270,8 +310,8 @@ export default function BahrainTrack({
 	    pitStopDoneRef.current = true;
 	    pitStopFinishedRef.current = true;
 
-	    if (onPitStopComplete) {
-	      onPitStopComplete();
+	    if (onPitStopCompleteRef.current) {
+	      onPitStopCompleteRef.current();
 	    }
 	    
 	    if (onPitPhaseChange) {
@@ -300,19 +340,21 @@ export default function BahrainTrack({
 	  lapProgressRef.current = 
 	    rejoinProgress - startProgress;
 
-	  if (onPitExit) {
-	    onPitExit();
+	  if (onPitExitRef.current) {
+	    onPitExitRef.current();
 	  }
 	}
       }
     } else {
-      lapProgressRef.current -= delta / lapDuration;
+      const speedFactor = 0.25 +0.75  * (movementSpeedRef.current / 320);
+
+      lapProgressRef.current -= delta / lapDuration * speedFactor;
 
       if (lapProgressRef.current <= -1) {
         lapProgressRef.current += 1;
 
-        if (onLapComplete) {
-          onLapComplete();
+        if (onLapCompleteRef.current) {
+          onLapCompleteRef.current();
         }
       }
 
@@ -323,11 +365,95 @@ export default function BahrainTrack({
 
     const point = path.getPointAtLength(distance);
 
+    let nearestTurn = null;
+    let nearestDistance = Infinity;
+
+    TURN_MARKERS.forEach((turn) => {
+      const turnProgress = turnProgressMapRef.current[turn.number];
+      const turnDistance = Math.abs(pathProgress - turnProgress)
+
+      if (turnDistance < nearestDistance) {
+        nearestDistance = turnDistance;
+        nearestTurn = turn.number;
+      }
+    });
+
     const nextDistance = 
       (distance + 2) % totalLength;
 
     const nextPoint = 
       path.getPointAtLength(nextDistance);
+
+    const previousDistance = 
+      (distance - 8 + totalLength) % totalLength;
+
+    const futureDistance = 
+      (distance + 8) % totalLength;
+
+    const previousPoint = 
+      path.getPointAtLength(previousDistance);
+
+    const futurePoint = 
+      path.getPointAtLength(futureDistance);
+
+    const angleBefore = Math.atan2(
+      point.y -previousPoint.y,
+      point.x -previousPoint.x
+    );
+
+    const angleAfter = Math.atan2(
+      futurePoint.y - point.y,
+      futurePoint.x - point.x
+    );
+
+    let angleDifference = Math.abs(
+      (angleAfter - angleBefore) * (180 /Math.PI)
+    );
+
+    let speed;
+
+    if (isInPit) {
+      speed = 80;
+
+      if (
+	      pitStopStartRef.current !== null && !pitStopFinishedRef.current
+      ) {
+	      speed = 0;
+      }
+    } else if (nearestTurn && turnData?.[nearestTurn]){
+      const turn = turnData[nearestTurn];
+
+      const turnProgress = turnProgressMapRef.current[nearestTurn];
+
+      let progressDifference = Math.abs(pathProgress - turnProgress);
+
+      progressDifference = Math.min(progressDifference, 1 - progressDifference);
+
+      const brakingZone = 0.06;
+      const accelerationZone = 0.05;
+
+      if (progressDifference < accelerationZone) {
+        const ratio = progressDifference / accelerationZone;
+
+        speed = turn.apexSpeed + (turn.exitSpeed - turn.apexSpeed) * ratio;
+      } else if (progressDifference < brakingZone) {
+        const ratio = (progressDifference - accelerationZone) / (brakingZone - accelerationZone);
+
+        speed = turn.exitSpeed + (turn.entrySpeed - turn.exitSpeed) * ratio;
+      } else {
+        speed = 320;
+      }
+    } else {
+      speed = 320;
+    }
+
+    if(!isInPit) {
+      movementSpeedRef.current = speed;
+    }
+
+    if (onSpeedChangeRef.current) {
+      onSpeedChangeRef.current(Math.round(speed));
+    }
 
     const angle = 
       Math.atan2(
@@ -351,13 +477,23 @@ export default function BahrainTrack({
     }
   };
   }, [
-   isSimulating, 
-   isInPit, 
-   garage, 
-   onLapComplete,
-   onPitStopComplete,
+    isSimulating,
+    isInPit,
+    garage,
+  ]);
+
+  useEffect(() => {
+    onLapCompleteRef.current = onLapComplete;
+    onPitStopCompleteRef.current = onPitStopComplete;
+    onPitExitRef.current = onPitExit;
+    onPitPhaseChangeRef.current = onPitPhaseChange;
+    onSpeedChangeRef.current = onSpeedChange;
+  }, [
+   onLapComplete, 
+   onPitStopComplete, 
    onPitExit,
    onPitPhaseChange,
+   onSpeedChange, 
   ]);
 
 

@@ -7,47 +7,47 @@ import RaceStatusBar from "./components/RaceStatusBar";
 const BAHRAIN_TURN_DATA = {
   1: {
     type: "Tight right-hander",
-    entrySpeed: 325,
-    apexSpeed: 85,
-    exitSpeed: 150,
+    entrySpeed: 313,
+    apexSpeed: 66,
+    exitSpeed: 145,
     braking: "Very high",
     tyreStress: "High",
   },
   2: {
     type: "Fast left kink",
-    entrySpeed: 150,
-    apexSpeed: 145,
-    exitSpeed: 185,
+    entrySpeed: 145,
+    apexSpeed: 138,
+    exitSpeed: 175,
     braking: "Low",
     tyreStress: "Medium",
   },
   3: {
     type: "Fast right kink",
-    entrySpeed: 185,
-    apexSpeed: 180,
-    exitSpeed: 235,
+    entrySpeed: 175,
+    apexSpeed: 170,
+    exitSpeed: 245,
     braking: "Low",
     tyreStress: "Medium",
   },
   4: {
     type: "Heavy-braking right",
-    entrySpeed: 300,
-    apexSpeed: 105,
-    exitSpeed: 165,
+    entrySpeed: 305,
+    apexSpeed: 123,
+    exitSpeed: 170,
     braking: "Very high",
     tyreStress: "High",
   },
   5: {
     type: "Fast left",
     entrySpeed: 245,
-    apexSpeed: 220,
-    exitSpeed: 225,
+    apexSpeed: 225,
+    exitSpeed: 230,
     braking: "Low",
     tyreStress: "High",
   },
   6: {
     type: "Fast right",
-    entrySpeed: 225,
+    entrySpeed: 230,
     apexSpeed: 205,
     exitSpeed: 195,
     braking: "Medium",
@@ -57,71 +57,71 @@ const BAHRAIN_TURN_DATA = {
     type: "Medium-speed left",
     entrySpeed: 195,
     apexSpeed: 150,
-    exitSpeed: 180,
+    exitSpeed: 185,
     braking: "Medium",
     tyreStress: "High",
   },
   8: {
     type: "Tight right-hander",
-    entrySpeed: 245,
-    apexSpeed: 90,
-    exitSpeed: 145,
+    entrySpeed: 258,
+    apexSpeed: 71,
+    exitSpeed: 140,
     braking: "High",
     tyreStress: "Medium",
   },
   9: {
     type: "Long left entry",
-    entrySpeed: 215,
-    apexSpeed: 165,
-    exitSpeed: 145,
+    entrySpeed: 210,
+    apexSpeed: 175,
+    exitSpeed: 150,
     braking: "Medium",
     tyreStress: "High",
   },
   10: {
     type: "Downhill left hairpin",
-    entrySpeed: 145,
-    apexSpeed: 80,
+    entrySpeed: 255,
+    apexSpeed: 68,
     exitSpeed: 135,
     braking: "High",
     tyreStress: "Very high",
   },
   11: {
     type: "Medium-speed left",
-    entrySpeed: 285,
-    apexSpeed: 175,
-    exitSpeed: 205,
+    entrySpeed: 304,
+    apexSpeed: 160,
+    exitSpeed: 215,
     braking: "High",
     tyreStress: "High",
   },
   12: {
     type: "Fast right",
-    entrySpeed: 205,
-    apexSpeed: 195,
-    exitSpeed: 240,
+    entrySpeed: 255,
+    apexSpeed: 245,
+    exitSpeed: 255,
     braking: "Low",
     tyreStress: "High",
   },
   13: {
     type: "Uphill right-hander",
-    entrySpeed: 245,
-    apexSpeed: 135,
-    exitSpeed: 190,
+    entrySpeed: 275,
+    apexSpeed: 146,
+    exitSpeed: 195,
     braking: "High",
     tyreStress: "Medium",
   },
   14: {
     type: "Final braking zone",
-    entrySpeed: 305,
-    apexSpeed: 120,
-    exitSpeed: 165,
+    entrySpeed: 295,
+    apexSpeed: 118,
+    exitSpeed: 170,
     braking: "Very high",
     tyreStress: "High",
   },
   15: {
     type: "Flat-out exit bend",
-    entrySpeed: 165,
-    apexSpeed: 175,
-    exitSpeed: 285,
+    entrySpeed: 170,
+    apexSpeed: 185,
+    exitSpeed: 290,
     braking: "None",
     tyreStress: "Medium",
   },
@@ -161,6 +161,7 @@ export default function App() {
   const [pitRequested, setPitRequested] = useState(false);
   const [pitPhase, setPitPhase] = useState("TRACK");
   const [pitLossPending, setPitLossPending] = useState(false);
+  const [liveSpeed, setLiveSpeed] = useState(0);
   const [resetKey, setResetKey] = useState(0);
   
   const MIN_ZOOM = 0.65;
@@ -622,12 +623,14 @@ export default function App() {
                   onTurnSelect={setSelectedTurn}
 		  isSimulating={isSimulating}
 		  onLapComplete={handleLapComplete}
+		  onSpeedChange={setLiveSpeed}
 		  onPitStopComplete={handlePitStopComplete}
 		  team={team}
                   onPitExit={handlePitExit}
 		  onPitPhaseChange={setPitPhase}
 		  pitPhase={pitPhase}
 		  isInPit={isInPit}
+		  turnData={BAHRAIN_TURN_DATA}
 		  garage={selectedTeam?.garage ?? 1}
                 />
               </div>
@@ -667,6 +670,17 @@ export default function App() {
                 </div>
               </>
             )}
+
+	    <div className="live-telemetry-box">
+	      <div className="live-telemetry-heading">
+		LIVE TELEMETRY
+	      </div>
+
+	      <div className="live-telemetry-row">
+		<span>SPEED</span>
+		<strong>{liveSpeed} km/h</strong>
+	      </div>
+	    </div>
 	    <RaceStatusBar
 	      currentLap={currentLap}
 	      laps={laps}
