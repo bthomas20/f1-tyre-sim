@@ -145,6 +145,7 @@ export default function BahrainTrack({
   isSimulating,
   onLapComplete,
   onSpeedChange,
+  onSectorChange,
   turnData,
   team,
   isInPit,
@@ -170,6 +171,7 @@ export default function BahrainTrack({
   const onPitExitRef = useRef(onPitExit);
   const onPitPhaseChangeRef = useRef(onPitPhaseChange);
   const onSpeedChangeRef = useRef(onSpeedChange);
+  const onSectorChangeRef = useRef(onSectorChange);
   const turnProgressMapRef = useRef(null);
   const [carTransform, setCarTransform] = useState(
     "translate(690 530) rotate(180)");  
@@ -266,6 +268,8 @@ export default function BahrainTrack({
     if (!turnProgressMapRef.current) {
       turnProgressMapRef.current = buildTurnProgressMap(circuitPath);
     }
+
+    console.log("TURN PROGRESS:", turnProgressMapRef.current);
 
     const path = isInPit ? pitPath : circuitPath;
 
@@ -370,13 +374,30 @@ export default function BahrainTrack({
 
     TURN_MARKERS.forEach((turn) => {
       const turnProgress = turnProgressMapRef.current[turn.number];
-      const turnDistance = Math.abs(pathProgress - turnProgress)
+      let turnDistance = Math.abs(pathProgress - turnProgress);
+
+      turnDistance = Math.min(turnDistance, 1 - turnDistance);
 
       if (turnDistance < nearestDistance) {
         nearestDistance = turnDistance;
         nearestTurn = turn.number;
       }
     });
+
+    let sector
+
+    if ( pathProgress<= 0.20 || pathProgress >= 0.84 ) {
+      sector = "S1";
+    } else if (pathProgress >= 0.41) {
+      sector = "S2";
+    }
+    else {
+      sector = "S3";
+    }
+
+    if (onSectorChangeRef.current) {
+      onSectorChangeRef.current(sector);
+    }
 
     const nextDistance = 
       (distance + 2) % totalLength;
@@ -493,7 +514,8 @@ export default function BahrainTrack({
    onPitStopComplete, 
    onPitExit,
    onPitPhaseChange,
-   onSpeedChange, 
+   onSpeedChange,
+   onSectorChange,
   ]);
 
 

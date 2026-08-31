@@ -162,6 +162,7 @@ export default function App() {
   const [pitPhase, setPitPhase] = useState("TRACK");
   const [pitLossPending, setPitLossPending] = useState(false);
   const [liveSpeed, setLiveSpeed] = useState(0);
+  const [liveSector, setLiveSector] = useState("S1");
   const [resetKey, setResetKey] = useState(0);
   
   const MIN_ZOOM = 0.65;
@@ -621,17 +622,18 @@ export default function App() {
                   key={resetKey}
                   selectedTurn={selectedTurn}
                   onTurnSelect={setSelectedTurn}
-		  isSimulating={isSimulating}
-		  onLapComplete={handleLapComplete}
-		  onSpeedChange={setLiveSpeed}
-		  onPitStopComplete={handlePitStopComplete}
-		  team={team}
+		              isSimulating={isSimulating}
+		              onLapComplete={handleLapComplete}
+		              onSpeedChange={setLiveSpeed}
+                  onSectorChange={setLiveSector}
+		              onPitStopComplete={handlePitStopComplete}
+		              team={team}
                   onPitExit={handlePitExit}
-		  onPitPhaseChange={setPitPhase}
-		  pitPhase={pitPhase}
-		  isInPit={isInPit}
-		  turnData={BAHRAIN_TURN_DATA}
-		  garage={selectedTeam?.garage ?? 1}
+		              onPitPhaseChange={setPitPhase}
+		              pitPhase={pitPhase}
+		              isInPit={isInPit}
+		              turnData={BAHRAIN_TURN_DATA}
+		              garage={selectedTeam?.garage ?? 1}
                 />
               </div>
             ) : (
@@ -673,13 +675,18 @@ export default function App() {
 
 	    <div className="live-telemetry-box">
 	      <div className="live-telemetry-heading">
-		LIVE TELEMETRY
+		  LIVE TELEMETRY
 	      </div>
 
 	      <div className="live-telemetry-row">
-		<span>SPEED</span>
-		<strong>{liveSpeed} km/h</strong>
+		      <span>SPEED</span>
+		      <strong>{liveSpeed} km/h</strong>
 	      </div>
+
+        <div className="live-telemetry-row">
+          <span>SECTOR</span>
+          <strong>{liveSector}</strong>
+        </div>
 	    </div>
 	    <RaceStatusBar
 	      currentLap={currentLap}
